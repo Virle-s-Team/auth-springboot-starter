@@ -6,9 +6,12 @@ import cool.auv.authspringbootstarter.service.SimpleUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
@@ -17,6 +20,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @ConditionalOnClass(SecurityFilterChain.class)
+@ComponentScan(basePackages = "cool.auv.authspringbootstarter")
+@EnableJpaRepositories(basePackages = "cool.auv.authspringbootstarter.repository")
+@EntityScan(basePackages = "cool.auv.authspringbootstarter.entity")
 public class SecurityAutoConfiguration {
 
     @Autowired
