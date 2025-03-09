@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: auth-spring-boot-starter
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://118.89.91.151:3306/code_gen_test?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+    username: root
+    password: 371982y
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      max-lifetime: 1800000   # 30??
+      idle-timeout: 600000   # 10??
+      connection-test-query: SELECT 1
+      keepalive-time: 60000  # 1??????
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+  security:
+    authentication:
+      jwt:
+        expiration: 604800000

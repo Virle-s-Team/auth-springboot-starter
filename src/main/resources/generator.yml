@@ -1,0 +1,22 @@
+auto-processor:
+  entity:
+    package-name: cool.auv.authspringbootstarter.entity
+    super-class: true
+    extend-from: cool.auv.gen.entity.BaseEntity
+  vm:
+    package-name: cool.auv.authspringbootstarter.vm
+  body:
+    package-name: cool.auv.authspringbootstarter.vm.body
+  request:
+    package-name: cool.auv.authspringbootstarter.vm.request
+  repository:
+    package-name: cool.auv.authspringbootstarter.repository
+  mapstruct:
+    package-name: cool.auv.authspringbootstarter.mapstruct
+  service:
+    package-name: cool.auv.authspringbootstarter.service
+    impl-package-name: cool.auv.authspringbootstarter.service.impl
+  controller:
+    package-name: cool.auv.authspringbootstarter.controller
+  enums:
+    package-name: cool.auv.authspringbootstarter.enums
