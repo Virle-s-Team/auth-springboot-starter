@@ -1,7 +1,6 @@
 package cool.auv.authspringbootstarter.vm;
 
 import cool.auv.codegeneratorjpa.core.entity.base.BaseEntity;
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;

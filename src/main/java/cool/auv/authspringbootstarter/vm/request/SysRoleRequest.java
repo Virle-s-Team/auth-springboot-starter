@@ -2,7 +2,7 @@ package cool.auv.authspringbootstarter.vm.request;
 
 import cool.auv.authspringbootstarter.entity.SysRole;
 import cool.auv.codegeneratorjpa.core.entity.base.BaseEntity;
-import jakarta.persistence.*;
+import cool.auv.codegeneratorjpa.core.service.RequestInterface;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -19,7 +19,7 @@ import org.springframework.data.jpa.domain.Specification;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class SysRoleRequest extends BaseEntity {
+public class SysRoleRequest extends BaseEntity implements RequestInterface<SysRole> {
 
     private static final long serialVersionUID = 1L;
 
@@ -37,8 +37,8 @@ public class SysRoleRequest extends BaseEntity {
 
     private Boolean isSuperAdmin;
 
+    @Override
     public Specification<SysRole> buildSpecification() {
         return null;
     }
-
 }

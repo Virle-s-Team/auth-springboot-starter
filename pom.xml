@@ -72,7 +72,7 @@
 
         <dependency>
             <groupId>cool.auv</groupId>
-            <artifactId>codeGenerator-jpa</artifactId>
+            <artifactId>code-generator-jpa</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
@@ -137,7 +137,7 @@
 
                         <path>
                             <groupId>cool.auv</groupId>
-                            <artifactId>codeGenerator-jpa</artifactId>
+                            <artifactId>code-generator-jpa</artifactId>
                             <version>0.0.1-SNAPSHOT</version>
                         </path>
 
