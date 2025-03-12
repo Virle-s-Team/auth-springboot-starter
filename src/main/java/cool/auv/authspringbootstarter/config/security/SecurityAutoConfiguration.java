@@ -45,7 +45,7 @@ public class SecurityAutoConfiguration {
     public SecurityFilterChain authFilterChain(HttpSecurity http) throws Exception {
         http = configureCommon(http);
         http
-                .securityMatcher("/api/v1/auth/**")
+                .securityMatcher("/api/v1/auth/**", "/swagger-ui/**", "/v3/api-docs/**")
                 .authorizeHttpRequests(authorize -> authorize
                         .anyRequest().permitAll()
                 );
