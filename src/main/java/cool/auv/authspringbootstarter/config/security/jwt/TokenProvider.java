@@ -2,13 +2,16 @@ package cool.auv.authspringbootstarter.config.security.jwt;
 
 import com.google.common.io.BaseEncoding;
 import cool.auv.authspringbootstarter.constant.AuthoritiesConstants;
-import cool.auv.authspringbootstarter.entity.UsernameAndUserIdPrincipal;
+import cool.auv.authspringbootstarter.entity.SysUser;
+import cool.auv.authspringbootstarter.service.SysUserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -26,6 +29,9 @@ public class TokenProvider {
     private final long expiration;
     private final String jwtSecret;
     private final SecretKey secretKey;
+    @Lazy
+    @Autowired
+    private SysUserService sysUserService;
 
     public TokenProvider(
             @Value("${spring.security.authentication.jwt.expiration:36000}") long expiration,
@@ -51,7 +57,6 @@ public class TokenProvider {
         return false;
     }
 
-
     public Authentication getAuthentication(String token) {
         // 解析token
         Claims claims = verifyJwt(token);
@@ -59,15 +64,12 @@ public class TokenProvider {
 //            throw new BadCredentialsException(INVALID_JWT_TOKEN);
 //        }
         // 获取token类型
-        UsernameAndUserIdPrincipal principal = new UsernameAndUserIdPrincipal();
         long userId = ((Number) claims.get(AuthoritiesConstants.LOGIN_ACCOUNT_ID)).longValue();
         String username = (String) claims.get(AuthoritiesConstants.LOGIN_ACCOUNT_NAME);
         // 设置认证对象
-        principal.setId(userId);
-        principal.setUsername(username);
-        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-//        redisService.expire(CommonConstant.PREFIX_USER_TOKEN + token, JwtUtils.getExpiration() * 2 / 1000);
-        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+        SysUser sysUser = sysUserService.loadUserWithAuthorities(userId);
+        List<SimpleGrantedAuthority> authorities = sysUser.getAuthorities();
+        return new UsernamePasswordAuthenticationToken(sysUser, token, authorities);
 
     }
 

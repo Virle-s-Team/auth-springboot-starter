@@ -10,10 +10,15 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -29,7 +34,7 @@ import java.util.Set;
 @Entity
 @Table(name = "sys_user")
 @AutoEntity(basePath = "/api/v1/sys-user")
-public class SysUser extends BaseEntity implements Serializable {
+public class SysUser extends BaseEntity implements Serializable, UserDetails {
 
     private static final long serialVersionUID = 1L;
 
@@ -110,4 +115,14 @@ public class SysUser extends BaseEntity implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "permission_id") // 关联实体外键
     )
     private Set<SysPermission> permissionSet;
+
+    @Override
+    public List<SimpleGrantedAuthority> getAuthorities() {
+        Set<SysPermission> rolePermission = roleSet.stream().flatMap(role -> role.getPermissionSet().stream()).collect(Collectors.toSet());
+        Set<SysPermission> allPermission = new HashSet<>();
+        allPermission.addAll(permissionSet);
+        allPermission.addAll(rolePermission);
+        return allPermission.stream().map(permission -> new SimpleGrantedAuthority(permission.getPermission())).toList();
+    }
+
 }

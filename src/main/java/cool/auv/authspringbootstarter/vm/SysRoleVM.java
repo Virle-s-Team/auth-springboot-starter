@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import java.util.Set;
+
 /**
  * <p>
  * 角色
@@ -33,5 +35,8 @@ public class SysRoleVM extends BaseEntity {
     private String remark;
 
     private Boolean isSuperAdmin;
+
+    private Set<SysPermissionVM> permissionSet;
+
 
 }

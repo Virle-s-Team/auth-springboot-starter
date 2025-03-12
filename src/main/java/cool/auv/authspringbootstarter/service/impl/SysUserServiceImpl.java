@@ -5,20 +5,27 @@ import cool.auv.authspringbootstarter.constant.AuthoritiesConstants;
 import cool.auv.authspringbootstarter.entity.SysPermission;
 import cool.auv.authspringbootstarter.entity.SysRole;
 import cool.auv.authspringbootstarter.entity.SysUser;
+import cool.auv.authspringbootstarter.mapstruct.BaseSysRoleMapstruct;
 import cool.auv.authspringbootstarter.service.BaseSysUserServiceImpl;
 import cool.auv.authspringbootstarter.service.SysUserService;
 import cool.auv.authspringbootstarter.utils.PasswordUtil;
 import cool.auv.authspringbootstarter.vm.LoginVM;
+import cool.auv.authspringbootstarter.vm.SysRoleVM;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Example;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.security.sasl.AuthenticationException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class SysUserServiceImpl extends BaseSysUserServiceImpl implements SysUserService {
@@ -26,8 +33,12 @@ public class SysUserServiceImpl extends BaseSysUserServiceImpl implements SysUse
     @PersistenceContext
     private EntityManager entityManager;
 
+    @Lazy
     @Autowired
     private TokenProvider tokenProvider;
+
+    @Autowired
+    private BaseSysRoleMapstruct baseSysRoleMapstruct;
 
 
     public String login(LoginVM loginVM) throws Exception {
@@ -81,5 +92,19 @@ public class SysUserServiceImpl extends BaseSysUserServiceImpl implements SysUse
         SysUser user = entityManager.getReference(SysUser.class, userId);
         SysPermission permission = entityManager.getReference(SysPermission.class, permissionId);
         user.getPermissionSet().remove(permission);
+    }
+
+    @Override
+    public Optional<Set<SysRoleVM>> getRole(Long userId) {
+        return baseSysUserRepository.findById(userId).map(user -> user.getRoleSet().stream().map(baseSysRoleMapstruct::entityToVm).collect(Collectors.toSet()));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public SysUser loadUserWithAuthorities(Long userId) {
+        SysUser sysUser = baseSysUserRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        sysUser.getAuthorities(); // 触发懒加载
+        return sysUser;
     }
 }

@@ -15,14 +15,14 @@ public class SysRoleController {
     @Autowired
     private SysRoleService sysRoleService;
 
-    @PutMapping("/{roleId}/assign-permission{permissionId}")
-    public ResponseEntity<Void> assignRoleToUser(@PathVariable(name = "roleId") Long roleId, @PathVariable(name = "roleId") Long permissionId) {
+    @PutMapping("/{roleId}/assign-permission/{permissionId}")
+    public ResponseEntity<Void> assignPermissionToRole(@PathVariable(name = "roleId") Long roleId, @PathVariable(name = "permissionId") Long permissionId) {
         sysRoleService.assignPermissionToRole(roleId, permissionId);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{roleId}/remove-permission/{permissionId}")
-    public ResponseEntity<Void> removeRoleFromUser(@PathVariable(name = "roleId") Long roleId, @PathVariable(name = "permissionId") Long permissionId) {
+    public ResponseEntity<Void> removePermissionFromRole(@PathVariable(name = "roleId") Long roleId, @PathVariable(name = "permissionId") Long permissionId) {
         sysRoleService.removePermissionFromRole(roleId, permissionId);
         return ResponseEntity.ok().build();
     }

@@ -32,16 +32,6 @@ public class SysUserVM {
     private String realname;
 
     /**
-     * 密码
-     */
-    private String password;
-
-    /**
-     * md5密码盐
-     */
-    private String salt;
-
-    /**
      * 头像
      */
     private String avatar;
