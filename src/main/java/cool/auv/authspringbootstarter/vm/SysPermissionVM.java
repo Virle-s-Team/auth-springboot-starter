@@ -1,6 +1,5 @@
 package cool.auv.authspringbootstarter.vm;
 
-import jakarta.persistence.OneToOne;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -22,7 +21,6 @@ public class SysPermissionVM implements Serializable {
     /**
      * 父id
      */
-    @OneToOne
     private SysPermissionVM parent;
 
     /**
