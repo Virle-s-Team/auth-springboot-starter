@@ -116,12 +116,17 @@ public class SysUser extends BaseEntity implements Serializable, UserDetails {
     )
     private Set<SysPermission> permissionSet;
 
-    @Override
-    public List<SimpleGrantedAuthority> getAuthorities() {
+    public Set<SysPermission> getAllPermission() {
         Set<SysPermission> rolePermission = roleSet.stream().flatMap(role -> role.getPermissionSet().stream()).collect(Collectors.toSet());
         Set<SysPermission> allPermission = new HashSet<>();
         allPermission.addAll(permissionSet);
         allPermission.addAll(rolePermission);
+        return allPermission;
+    }
+
+    @Override
+    public List<SimpleGrantedAuthority> getAuthorities() {
+        Set<SysPermission> allPermission = getAllPermission();
         return allPermission.stream().map(permission -> new SimpleGrantedAuthority(permission.getPermission())).toList();
     }
 

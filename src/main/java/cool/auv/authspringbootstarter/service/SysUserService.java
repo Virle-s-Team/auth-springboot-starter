@@ -2,6 +2,7 @@ package cool.auv.authspringbootstarter.service;
 
 import cool.auv.authspringbootstarter.entity.SysUser;
 import cool.auv.authspringbootstarter.vm.LoginVM;
+import cool.auv.authspringbootstarter.vm.SysPermissionTreeVM;
 import cool.auv.authspringbootstarter.vm.SysRoleVM;
 
 import java.util.Optional;
@@ -22,4 +23,6 @@ public interface SysUserService extends BaseSysUserService{
     Optional<Set<SysRoleVM>> getRole(Long userId);
 
     SysUser loadUserWithAuthorities(Long userId);
+
+    Optional<Set<SysPermissionTreeVM>> getCurrentUserPermission();
 }

@@ -9,7 +9,9 @@ import cool.auv.authspringbootstarter.mapstruct.BaseSysRoleMapstruct;
 import cool.auv.authspringbootstarter.service.BaseSysUserServiceImpl;
 import cool.auv.authspringbootstarter.service.SysUserService;
 import cool.auv.authspringbootstarter.utils.PasswordUtil;
+import cool.auv.authspringbootstarter.utils.SecurityContextUtil;
 import cool.auv.authspringbootstarter.vm.LoginVM;
+import cool.auv.authspringbootstarter.vm.SysPermissionTreeVM;
 import cool.auv.authspringbootstarter.vm.SysRoleVM;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -106,5 +108,26 @@ public class SysUserServiceImpl extends BaseSysUserServiceImpl implements SysUse
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         sysUser.getAuthorities(); // 触发懒加载
         return sysUser;
+    }
+
+    @Override
+    public Optional<Set<SysPermissionTreeVM>> getCurrentUserPermission() {
+        // 获取用户的所有权限
+        Optional<SysUser> currentUser = SecurityContextUtil.getCurrentUser();
+        // 构建树状结构
+        return currentUser.map(sysUser -> {
+
+            Set<SysPermission> allPermission = sysUser.getAllPermission();
+            // 过滤出顶级权限
+            Set<SysPermission> topPermission = allPermission.stream().filter(permission -> permission.getParent() == null).collect(Collectors.toSet());
+
+            return topPermission.stream().map(permission -> {
+                // 根据当前的permission获取子permission
+                Set<SysPermission> children = allPermission.stream().filter(item -> item.getParent() != null && permission.getId().equals(item.getParent().getId())).collect(Collectors.toSet());
+                // 构建vm
+                return new SysPermissionTreeVM().setPermission(permission).setChildren(children);
+            }).collect(Collectors.toSet());
+
+        });
     }
 }
