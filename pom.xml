@@ -31,6 +31,14 @@
         <jjwt.version>0.12.6</jjwt.version>
     </properties>
 
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub OWNER Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/Virle-s-Team/auth-springboot-starter</url>
+        </repository>
+    </distributionManagement>
+
     <repositories>
         <repository>
             <id>aliyunmaven</id>
@@ -41,6 +49,12 @@
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
+        </repository>
+
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/Virle-s-Team/code-generator-jpa</url>
         </repository>
     </repositories>
 
