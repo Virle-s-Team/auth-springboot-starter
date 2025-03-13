@@ -36,4 +36,4 @@ jobs:
         run: mvn clean package -s settings.xml -U -X
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_ACTOR: geyingauv
