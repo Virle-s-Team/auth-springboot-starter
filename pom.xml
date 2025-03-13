@@ -50,12 +50,6 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
-
-        <repository>
-            <id>github</id>
-            <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/Virle-s-Team/code-generator-jpa</url>
-        </repository>
     </repositories>
 
     <dependencies>

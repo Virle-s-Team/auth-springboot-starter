@@ -12,7 +12,7 @@
                 </repository>
                 <repository>
                     <id>github</id>
-                    <url>https://maven.pkg.github.com/OWNER/REPOSITORY</url>
+                    <url>https://maven.pkg.github.com/Virle-s-Team/code-generator-jpa</url>
                     <snapshots>
                         <enabled>true</enabled>
                     </snapshots>

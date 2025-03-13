@@ -34,3 +34,4 @@ jobs:
         run: mvn deploy -s setting.xml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
