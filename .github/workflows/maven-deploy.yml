@@ -30,6 +30,8 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
+      - name: Debug Metadata Access
+        run: curl -v -u "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" https://maven.pkg.github.com/Virle-s-Team/code-generator-jpa/cool/auv/code-generator-jpa/0.0.1-SNAPSHOT/maven-metadata.xml
       - name: Publish package
         run: mvn clean package -s settings.xml -U -X
         env:
