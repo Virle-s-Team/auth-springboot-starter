@@ -30,17 +30,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
-
-      - name: Check GITHUB_TOKEN permissions
-        run: |
-          curl -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/orgs/Virle-s-Team/code-generator-jpa/packages?package_type=maven
-
       - name: Debug Metadata Access
-        run: curl -v -u "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" https://maven.pkg.github.com/Virle-s-Team/code-generator-jpa/cool/auv/code-generator-jpa/0.0.1-SNAPSHOT/maven-metadata.xml
+        run: curl -v -u "${{ github.actor }}:${{ secrets.PAT }}" https://maven.pkg.github.com/Virle-s-Team/code-generator-jpa/cool/auv/code-generator-jpa/0.0.1-SNAPSHOT/maven-metadata.xml
       - name: Publish package
         run: mvn clean package -s settings.xml -U -X
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_PAT: ${{ secrets.PAT }}
