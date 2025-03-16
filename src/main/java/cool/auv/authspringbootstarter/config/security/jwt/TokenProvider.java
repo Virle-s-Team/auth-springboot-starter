@@ -35,7 +35,7 @@ public class TokenProvider {
 
     public TokenProvider(
             @Value("${spring.security.authentication.jwt.expiration:36000}") long expiration,
-            @Value("${spring.security.authentication.jwt.secret:cuit.pymjl.epoch}") String jwtSecret) {
+            @Value("${spring.security.authentication.jwt.secret:Q2FzZQ5M2NvbXB1dGVyIQ5wcm9ncmFtbWluZw==}") String jwtSecret) {
         this.expiration = expiration <= 0 ? 2 * 60 * 60 * TIME_UNIT : expiration;
         this.jwtSecret = jwtSecret;
         this.secretKey = generateSecretKey(jwtSecret);
@@ -124,10 +124,8 @@ public class TokenProvider {
             keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
         }
 
-        // Ensure key length is sufficient (at least 32 bytes for HS256)
         if (keyBytes.length < 32) {
-            log.warn("JWT secret is too short ({} bytes), minimum 32 bytes required for HS256", keyBytes.length);
-            keyBytes = Arrays.copyOf(keyBytes, 32); // Pad with zeros (not ideal for security)
+            throw new IllegalStateException("JWT secret is too short (" + keyBytes.length + " bytes), minimum 32 bytes required for HS256");
         }
 
         return Keys.hmacShaKeyFor(keyBytes);
