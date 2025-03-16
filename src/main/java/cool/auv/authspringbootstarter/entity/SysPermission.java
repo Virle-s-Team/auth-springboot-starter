@@ -14,7 +14,7 @@ import java.io.Serializable;
 @Accessors(chain = true)
 @Entity
 @Table(name = "sys_permission")
-@AutoEntity(basePath = "/api/v1/sys-permission")
+@AutoEntity(basePath = "/api/v1/sys-permission", docTag = "权限管理")
 public class SysPermission implements Serializable {
 
     private static final long serialVersionUID = 1L;

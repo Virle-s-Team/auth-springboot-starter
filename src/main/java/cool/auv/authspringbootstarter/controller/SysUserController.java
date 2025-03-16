@@ -2,7 +2,10 @@ package cool.auv.authspringbootstarter.controller;
 
 import cool.auv.authspringbootstarter.service.SysUserService;
 import cool.auv.authspringbootstarter.vm.SysRoleVM;
+import cool.auv.authspringbootstarter.vm.SysUserUpdateVM;
+import cool.auv.codegeneratorjpa.core.exception.AppException;
 import cool.auv.codegeneratorjpa.core.utils.ResponseUtil;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,10 +15,19 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/sys-user")
+@Tag(
+        name = "用户管理"
+)
 public class SysUserController {
 
     @Autowired
     private SysUserService sysUserService;
+
+    @PostMapping
+    public ResponseEntity<Void> save(@RequestBody SysUserUpdateVM sysUserVM) throws AppException {
+        sysUserService.save(sysUserVM);
+        return ResponseEntity.ok().build();
+    }
 
     @PutMapping("/{userId}/assign-role{roleId}")
     public ResponseEntity<Void> assignRoleToUser(@PathVariable(name = "userId") Long userId, @PathVariable(name = "roleId") Long roleId) {

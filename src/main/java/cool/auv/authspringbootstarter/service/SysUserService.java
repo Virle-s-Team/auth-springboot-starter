@@ -4,6 +4,8 @@ import cool.auv.authspringbootstarter.entity.SysUser;
 import cool.auv.authspringbootstarter.vm.LoginVM;
 import cool.auv.authspringbootstarter.vm.SysPermissionTreeVM;
 import cool.auv.authspringbootstarter.vm.SysRoleVM;
+import cool.auv.authspringbootstarter.vm.SysUserUpdateVM;
+import cool.auv.codegeneratorjpa.core.exception.AppException;
 
 import java.util.Optional;
 import java.util.Set;
@@ -25,4 +27,8 @@ public interface SysUserService extends BaseSysUserService{
     SysUser loadUserWithAuthorities(Long userId);
 
     Optional<Set<SysPermissionTreeVM>> getCurrentUserPermission();
+
+    void save(SysUserUpdateVM sysUserVM) throws AppException;
+
+    void update(SysUserUpdateVM sysUserVM) throws AppException;
 }

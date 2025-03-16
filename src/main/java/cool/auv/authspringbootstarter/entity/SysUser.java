@@ -33,7 +33,11 @@ import java.util.stream.Collectors;
 @Accessors(chain = true)
 @Entity
 @Table(name = "sys_user")
-@AutoEntity(basePath = "/api/v1/sys-user")
+@AutoEntity(
+        basePath = "/api/v1/sys-user",
+        docTag = "用户管理",
+        controllerExclude = {AutoEntity.ControllerExclude.save, AutoEntity.ControllerExclude.update}
+)
 public class SysUser extends BaseEntity implements Serializable, UserDetails {
 
     private static final long serialVersionUID = 1L;
@@ -65,6 +69,16 @@ public class SysUser extends BaseEntity implements Serializable, UserDetails {
      * md5密码盐
      */
     private String salt;
+
+    /**
+     * 加密key
+     */
+    private String secretKey;
+
+    /**
+     * AES 初始向量
+     */
+    private String iv;
 
     /**
      * 头像

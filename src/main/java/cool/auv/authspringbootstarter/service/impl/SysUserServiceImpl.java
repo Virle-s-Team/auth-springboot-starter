@@ -6,6 +6,7 @@ import cool.auv.authspringbootstarter.entity.SysPermission;
 import cool.auv.authspringbootstarter.entity.SysRole;
 import cool.auv.authspringbootstarter.entity.SysUser;
 import cool.auv.authspringbootstarter.mapstruct.BaseSysRoleMapstruct;
+import cool.auv.authspringbootstarter.mapstruct.SysUserUpdateVMMapstruct;
 import cool.auv.authspringbootstarter.service.BaseSysUserServiceImpl;
 import cool.auv.authspringbootstarter.service.SysUserService;
 import cool.auv.authspringbootstarter.utils.PasswordUtil;
@@ -13,8 +14,11 @@ import cool.auv.authspringbootstarter.utils.SecurityContextUtil;
 import cool.auv.authspringbootstarter.vm.LoginVM;
 import cool.auv.authspringbootstarter.vm.SysPermissionTreeVM;
 import cool.auv.authspringbootstarter.vm.SysRoleVM;
+import cool.auv.authspringbootstarter.vm.SysUserUpdateVM;
+import cool.auv.codegeneratorjpa.core.exception.AppException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Example;
@@ -42,6 +46,9 @@ public class SysUserServiceImpl extends BaseSysUserServiceImpl implements SysUse
     @Autowired
     private BaseSysRoleMapstruct baseSysRoleMapstruct;
 
+    @Autowired
+    private SysUserUpdateVMMapstruct sysUserUpdateVMMapstruct;
+
 
     public String login(LoginVM loginVM) throws Exception {
         String username = loginVM.getUsername();
@@ -49,7 +56,7 @@ public class SysUserServiceImpl extends BaseSysUserServiceImpl implements SysUse
 
         SysUser user = baseSysUserRepository.findOne(Example.of(new SysUser().setUsername(username))).orElseThrow(() -> new AuthenticationException("User not found: " + username));
 
-        String genPwd = PasswordUtil.encrypt(username, password, user.getSalt().getBytes());
+        String genPwd = PasswordUtil.encrypt(password, user.getSecretKey(), user.getSalt(), user.getIv());
         String origin = user.getPassword();
 
         if (!origin.equals(genPwd)) {
@@ -129,5 +136,53 @@ public class SysUserServiceImpl extends BaseSysUserServiceImpl implements SysUse
             }).collect(Collectors.toSet());
 
         });
+    }
+
+
+    @Override
+    @Transactional
+    public void save(SysUserUpdateVM sysUserVM) throws AppException {
+        SysUser sysUser = sysUserUpdateVMMapstruct.vmToEntity(sysUserVM);
+        if (StringUtils.isNotEmpty(sysUser.getPassword())) {
+            try {
+                String salt = PasswordUtil.generateSalt();
+                String key = PasswordUtil.generateKey();
+                String iv = PasswordUtil.generateIV();
+
+                String encrypt = PasswordUtil.encrypt(sysUser.getPassword(), key, salt, iv);
+                sysUser.setSalt(salt);
+                sysUser.setSecretKey(key);
+                sysUser.setPassword(encrypt);
+                sysUser.setIv(iv);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        baseSysUserRepository.save(sysUser);
+    }
+
+    @Override
+    @Transactional
+    public void update(SysUserUpdateVM sysUserVM) throws AppException {
+        baseSysUserRepository.findById(sysUserVM.getId()).ifPresent(sysUser -> {
+            sysUserUpdateVMMapstruct.updateEntityFromVM(sysUserVM, sysUser);
+            if (StringUtils.isNotEmpty(sysUser.getPassword())) {
+                try {
+                    String salt = sysUser.getSalt();
+                    String key = sysUser.getSecretKey();
+                    String iv = sysUser.getIv();
+
+                    String encrypt = PasswordUtil.encrypt(sysUser.getPassword(), key, salt, iv);
+                    sysUser.setSalt(salt);
+                    sysUser.setSecretKey(key);
+                    sysUser.setPassword(encrypt);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+
     }
 }

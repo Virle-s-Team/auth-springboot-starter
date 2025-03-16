@@ -22,7 +22,7 @@ import java.util.Set;
 @Accessors(chain = true)
 @Entity
 @Table(name = "sys_role")
-@AutoEntity(basePath = "/api/v1/sys-role")
+@AutoEntity(basePath = "/api/v1/sys-role", docTag = "角色管理")
 public class SysRole extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
