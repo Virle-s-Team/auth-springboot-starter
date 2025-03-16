@@ -3,7 +3,6 @@ package cool.auv.authspringbootstarter.config.security;
 import cool.auv.authspringbootstarter.config.security.jwt.JWTFilter;
 import cool.auv.authspringbootstarter.config.security.jwt.TokenProvider;
 import cool.auv.authspringbootstarter.service.SimpleUserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -24,9 +23,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableJpaRepositories(basePackages = "cool.auv.authspringbootstarter.repository")
 @EntityScan(basePackages = "cool.auv.authspringbootstarter.entity")
 public class SecurityAutoConfiguration {
-
-    @Autowired
-    private TokenProvider tokenProvider;
 
     @Bean
     @ConditionalOnMissingBean
