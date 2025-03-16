@@ -58,4 +58,11 @@ public class SysUserController {
         Optional<Set<SysRoleVM>> roleSet = sysUserService.getRole(userId);
         return ResponseUtil.wrapOrNotFound(roleSet);
     }
+
+    @PutMapping("/{userId}/reset-password")
+    public ResponseEntity<Void> resetPassword(@PathVariable(name = "userId") Long userId) {
+        sysUserService.resetPassword(userId);
+        return ResponseEntity.ok().build();
+    }
+
 }

@@ -20,6 +20,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Example;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -49,6 +50,8 @@ public class SysUserServiceImpl extends BaseSysUserServiceImpl implements SysUse
     @Autowired
     private SysUserUpdateVMMapstruct sysUserUpdateVMMapstruct;
 
+    @Value("${app.reset-password}")
+    private String resetPassword = "123456";
 
     public String login(LoginVM loginVM) throws Exception {
         String username = loginVM.getUsername();
@@ -173,9 +176,7 @@ public class SysUserServiceImpl extends BaseSysUserServiceImpl implements SysUse
                     String key = sysUser.getSecretKey();
                     String iv = sysUser.getIv();
 
-                    String encrypt = PasswordUtil.encrypt(sysUser.getPassword(), key, salt, iv);
-                    sysUser.setSalt(salt);
-                    sysUser.setSecretKey(key);
+                    String encrypt = PasswordUtil.encrypt(sysUserVM.getPassword(), key, salt, iv);
                     sysUser.setPassword(encrypt);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -184,5 +185,24 @@ public class SysUserServiceImpl extends BaseSysUserServiceImpl implements SysUse
         });
 
 
+    }
+
+    @Override
+    @Transactional
+    public void resetPassword(Long userId) {
+        baseSysUserRepository.findById(userId).ifPresent(sysUser -> {
+            if (StringUtils.isNotEmpty(sysUser.getPassword())) {
+                try {
+                    String salt = sysUser.getSalt();
+                    String key = sysUser.getSecretKey();
+                    String iv = sysUser.getIv();
+
+                    String encrypt = PasswordUtil.encrypt(resetPassword, key, salt, iv);
+                    sysUser.setPassword(encrypt);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 }

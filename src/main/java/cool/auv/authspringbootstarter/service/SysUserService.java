@@ -31,4 +31,6 @@ public interface SysUserService extends BaseSysUserService{
     void save(SysUserUpdateVM sysUserVM) throws AppException;
 
     void update(SysUserUpdateVM sysUserVM) throws AppException;
+
+    void resetPassword(Long userId);
 }
