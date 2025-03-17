@@ -34,7 +34,7 @@ public class TokenProvider {
     private SysUserService sysUserService;
 
     public TokenProvider(
-            @Value("${spring.security.authentication.jwt.expiration:36000}") long expiration,
+            @Value("${spring.security.authentication.jwt.expiration:1800000}") long expiration,
             @Value("${spring.security.authentication.jwt.secret:Q2FzZQ5M2NvbXB1dGVyIQ5wcm9ncmFtbWluZw==}") String jwtSecret) {
         this.expiration = expiration <= 0 ? 2 * 60 * 60 * TIME_UNIT : expiration;
         this.jwtSecret = jwtSecret;
