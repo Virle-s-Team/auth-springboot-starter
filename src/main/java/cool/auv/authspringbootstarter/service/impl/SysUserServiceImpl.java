@@ -50,8 +50,8 @@ public class SysUserServiceImpl extends BaseSysUserServiceImpl implements SysUse
     @Autowired
     private SysUserUpdateVMMapstruct sysUserUpdateVMMapstruct;
 
-    @Value("${app.reset-password}")
-    private String resetPassword = "123456";
+    @Value("${app.reset-password:123456}")
+    private String resetPassword;
 
     public String login(LoginVM loginVM) throws Exception {
         String username = loginVM.getUsername();
