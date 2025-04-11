@@ -45,6 +45,12 @@ public class SecurityGlobalExceptionHandler implements AuthenticationEntryPoint,
         HttpResponseWriter.sendError(response, HttpServletResponse.SC_FORBIDDEN, "AccessDenied");
     }
 
+    @ExceptionHandler(Exception.class)
+    public void exceptionHandler(HttpServletResponse response, Exception e) {
+        log.error("系统发生未知异常。", e);
+        HttpResponseWriter.sendError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR");
+    }
+
     private static class HttpResponseWriter {
 
         public static final String UTF8 = "UTF-8";
