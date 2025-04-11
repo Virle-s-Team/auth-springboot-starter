@@ -1,5 +1,7 @@
 package cool.auv.authspringbootstarter.utils;
 
+import cool.auv.codegeneratorjpa.core.exception.AppException;
+
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -54,13 +56,17 @@ public class PasswordUtil {
     }
 
     // 加密方法
-    public static String encrypt(String plaintext, String key, String salt, String iv) throws Exception {
-        SecretKey secretKey = deriveKey(key, salt);
-        IvParameterSpec ivSpec = new IvParameterSpec(hexStringToBytes(iv));
-        synchronized (CIPHER) {
-            CIPHER.init(Cipher.ENCRYPT_MODE, secretKey, ivSpec);
-            byte[] encryptedData = CIPHER.doFinal(plaintext.getBytes(StandardCharsets.UTF_8));
-            return bytesToHexString(encryptedData);
+    public static String encrypt(String plaintext, String key, String salt, String iv) throws AppException {
+        try {
+            SecretKey secretKey = deriveKey(key, salt);
+            IvParameterSpec ivSpec = new IvParameterSpec(hexStringToBytes(iv));
+            synchronized (CIPHER) {
+                CIPHER.init(Cipher.ENCRYPT_MODE, secretKey, ivSpec);
+                byte[] encryptedData = CIPHER.doFinal(plaintext.getBytes(StandardCharsets.UTF_8));
+                return bytesToHexString(encryptedData);
+            }
+        } catch (Exception e) {
+            throw new AppException("加密错误");
         }
     }
 

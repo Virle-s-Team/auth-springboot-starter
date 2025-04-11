@@ -153,13 +153,11 @@ public class SysUserServiceImpl extends BaseSysUserServiceImpl implements SysUse
         sysUser.setSecretKey(key);
         sysUser.setIv(iv);
         if (StringUtils.isNotEmpty(sysUser.getPassword())) {
-            try {
-
-                String encrypt = PasswordUtil.encrypt(sysUser.getPassword(), key, salt, iv);
-                sysUser.setPassword(encrypt);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            String encrypt = PasswordUtil.encrypt(sysUser.getPassword(), key, salt, iv);
+            sysUser.setPassword(encrypt);
+        } else {
+            String encrypt = PasswordUtil.encrypt(PasswordUtil.generateKey(), key, salt, iv);
+            sysUser.setPassword(encrypt);
         }
         baseSysUserRepository.save(sysUser);
     }
