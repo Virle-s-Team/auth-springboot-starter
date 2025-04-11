@@ -26,7 +26,7 @@ public class SysUserRequest implements RequestInterface<SysUser> {
     /**
      * 真实姓名
      */
-    private String realname;
+    private String realName;
 
     /**
      * 密码

@@ -58,7 +58,7 @@ public class SysUser extends BaseEntity implements Serializable, UserDetails {
     /**
      * 真实姓名
      */
-    private String realname;
+    private String realName;
 
     /**
      * 密码
