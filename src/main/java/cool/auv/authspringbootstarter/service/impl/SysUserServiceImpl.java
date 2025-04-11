@@ -23,11 +23,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Example;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.security.sasl.AuthenticationException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -57,13 +57,13 @@ public class SysUserServiceImpl extends BaseSysUserServiceImpl implements SysUse
         String username = loginVM.getUsername();
         String password = loginVM.getPassword();
 
-        SysUser user = baseSysUserRepository.findOne(Example.of(new SysUser().setUsername(username))).orElseThrow(() -> new AuthenticationException("User not found: " + username));
+        SysUser user = baseSysUserRepository.findOne(Example.of(new SysUser().setUsername(username))).orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
         String genPwd = PasswordUtil.encrypt(password, user.getSecretKey(), user.getSalt(), user.getIv());
         String origin = user.getPassword();
 
         if (!origin.equals(genPwd)) {
-            throw new AuthenticationException("用户名或密码错误");
+            throw new AuthenticationServiceException("用户名或密码错误");
         }
 
         // 生成token
