@@ -146,22 +146,21 @@ public class SysUserServiceImpl extends BaseSysUserServiceImpl implements SysUse
     @Transactional
     public void save(SysUserUpdateVM sysUserVM) throws AppException {
         SysUser sysUser = sysUserUpdateVMMapstruct.vmToEntity(sysUserVM);
+        String salt = PasswordUtil.generateSalt();
+        String key = PasswordUtil.generateKey();
+        String iv = PasswordUtil.generateIV();
+        sysUser.setSalt(salt);
+        sysUser.setSecretKey(key);
+        sysUser.setIv(iv);
         if (StringUtils.isNotEmpty(sysUser.getPassword())) {
             try {
-                String salt = PasswordUtil.generateSalt();
-                String key = PasswordUtil.generateKey();
-                String iv = PasswordUtil.generateIV();
 
                 String encrypt = PasswordUtil.encrypt(sysUser.getPassword(), key, salt, iv);
-                sysUser.setSalt(salt);
-                sysUser.setSecretKey(key);
                 sysUser.setPassword(encrypt);
-                sysUser.setIv(iv);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
-
         baseSysUserRepository.save(sysUser);
     }
 
