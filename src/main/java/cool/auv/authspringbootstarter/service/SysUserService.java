@@ -33,4 +33,6 @@ public interface SysUserService extends BaseSysUserService{
     void update(SysUserUpdateVM sysUserVM) throws AppException;
 
     void resetPassword(Long userId);
+
+    void updatePassword(String oldPassword, String newPassword) throws AppException;
 }

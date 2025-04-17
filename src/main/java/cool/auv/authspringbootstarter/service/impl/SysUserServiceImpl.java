@@ -156,7 +156,7 @@ public class SysUserServiceImpl extends BaseSysUserServiceImpl implements SysUse
             String encrypt = PasswordUtil.encrypt(sysUser.getPassword(), key, salt, iv);
             sysUser.setPassword(encrypt);
         } else {
-            String encrypt = PasswordUtil.encrypt(PasswordUtil.generateKey(), key, salt, iv);
+            String encrypt = PasswordUtil.encrypt(resetPassword, key, salt, iv);
             sysUser.setPassword(encrypt);
         }
         baseSysUserRepository.save(sysUser);
@@ -201,5 +201,25 @@ public class SysUserServiceImpl extends BaseSysUserServiceImpl implements SysUse
                 }
             }
         });
+    }
+
+    @Override
+    @Transactional
+    public void updatePassword(String oldPassword, String newPassword) throws AppException {
+        Optional<SysUser> currentUser = SecurityContextUtil.getCurrentUser();
+        SysUser sysUser = currentUser.orElseThrow(() -> new AppException("当前用户信息获取失败"));
+        String salt = sysUser.getSalt();
+        String key = sysUser.getSecretKey();
+        String iv = sysUser.getIv();
+        // 加密前台的旧密码
+        String webPwdEncrypt = PasswordUtil.encrypt(oldPassword, key, salt, iv);
+        if (webPwdEncrypt.equals(sysUser.getPassword())) {
+            // 加密新密码
+            String encrypt = PasswordUtil.encrypt(newPassword, key, salt, iv);
+            sysUser.setPassword(encrypt);
+            baseSysUserRepository.save(sysUser);
+        } else {
+            throw new AppException("旧密码错误");
+        }
     }
 }

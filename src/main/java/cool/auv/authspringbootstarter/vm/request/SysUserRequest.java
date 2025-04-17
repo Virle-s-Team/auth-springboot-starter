@@ -2,14 +2,25 @@ package cool.auv.authspringbootstarter.vm.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import cool.auv.authspringbootstarter.entity.SysUser;
+import cool.auv.authspringbootstarter.entity.SysUser_;
 import cool.auv.authspringbootstarter.enums.ActiveStatusEnum;
 import cool.auv.authspringbootstarter.enums.GenderEnum;
 import cool.auv.codegeneratorjpa.core.service.RequestInterface;
+import jakarta.persistence.criteria.Predicate;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+@Getter
+@Setter
+@Accessors(chain = true)
 public class SysUserRequest implements RequestInterface<SysUser> {
 
 
@@ -73,6 +84,15 @@ public class SysUserRequest implements RequestInterface<SysUser> {
 
     @Override
     public Specification<SysUser> buildSpecification() {
-        return null;
+        return (root, criteriaQuery, criteriaBuilder) -> {
+            List<Predicate> predicateList = new ArrayList<>();
+            if (StringUtils.isNotEmpty(realName)) {
+                predicateList.add(criteriaBuilder.like(root.get(SysUser_.REAL_NAME), "%" + this.realName + "%"));
+            }
+            if (StringUtils.isNotEmpty(phone)) {
+                predicateList.add(criteriaBuilder.like(root.get(SysUser_.PHONE), "%" + this.phone + "%"));
+            }
+            return criteriaBuilder.and(predicateList.toArray(new Predicate[0]));
+        };
     }
 }
