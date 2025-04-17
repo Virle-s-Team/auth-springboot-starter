@@ -3,6 +3,7 @@ package cool.auv.authspringbootstarter.vm;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import cool.auv.authspringbootstarter.enums.ActiveStatusEnum;
 import cool.auv.authspringbootstarter.enums.GenderEnum;
+import cool.auv.codegeneratorjpa.core.entity.base.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class SysUserVM {
+public class SysUserVM extends BaseEntity {
 
 
     /**
