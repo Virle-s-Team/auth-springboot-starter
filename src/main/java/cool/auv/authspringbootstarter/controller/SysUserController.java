@@ -35,7 +35,7 @@ public class SysUserController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/{userId}/assign-role{roleId}")
+    @PutMapping("/{userId}/assign-role/{roleId}")
     public ResponseEntity<Void> assignRoleToUser(@PathVariable(name = "userId") Long userId, @PathVariable(name = "roleId") Long roleId) {
         sysUserService.assignRoleToUser(userId, roleId);
         return ResponseEntity.ok().build();

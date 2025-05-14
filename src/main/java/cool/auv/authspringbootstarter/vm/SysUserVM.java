@@ -10,6 +10,7 @@ import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -63,4 +64,6 @@ public class SysUserVM extends BaseEntity {
      * 激活状态
      */
     private ActiveStatusEnum status;
+
+    private Set<SysRoleVM> roleSet;
 }

@@ -105,6 +105,7 @@ public class SysUserServiceImpl extends BaseSysUserServiceImpl implements SysUse
         user.getPermissionSet().remove(permission);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Optional<Set<SysRoleVM>> getRole(Long userId) {
         return baseSysUserRepository.findById(userId).map(user -> user.getRoleSet().stream().map(baseSysRoleMapstruct::entityToVm).collect(Collectors.toSet()));
@@ -119,6 +120,7 @@ public class SysUserServiceImpl extends BaseSysUserServiceImpl implements SysUse
         return sysUser;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Optional<Set<SysPermissionTreeVM>> getCurrentUserPermission() {
         // 获取用户的所有权限
@@ -165,19 +167,24 @@ public class SysUserServiceImpl extends BaseSysUserServiceImpl implements SysUse
     @Transactional
     public void update(SysUserUpdateVM sysUserVM) throws AppException {
         baseSysUserRepository.findById(sysUserVM.getId()).ifPresent(sysUser -> {
-            sysUserUpdateVMMapstruct.updateEntityFromVM(sysUserVM, sysUser);
-            if (StringUtils.isNotEmpty(sysUser.getPassword())) {
+            // 如果前端没修改密码 保留原密码防止被空值替换
+            if (StringUtils.isEmpty(sysUserVM.getPassword())) {
+                sysUserVM.setPassword(sysUser.getPassword());
+            }
+            // 否则加密新密码
+            else {
                 try {
                     String salt = sysUser.getSalt();
                     String key = sysUser.getSecretKey();
                     String iv = sysUser.getIv();
 
                     String encrypt = PasswordUtil.encrypt(sysUserVM.getPassword(), key, salt, iv);
-                    sysUser.setPassword(encrypt);
+                    sysUserVM.setPassword(encrypt);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }
+            sysUserUpdateVMMapstruct.updateEntityFromVM(sysUserVM, sysUser);
         });
 
 
