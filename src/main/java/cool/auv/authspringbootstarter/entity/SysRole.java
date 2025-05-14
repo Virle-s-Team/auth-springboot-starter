@@ -36,6 +36,8 @@ public class SysRole extends BaseEntity {
      */
     private String name;
 
+    private String code;
+
     /**
      * 备注
      */
@@ -43,7 +45,7 @@ public class SysRole extends BaseEntity {
 
     private Boolean isSuperAdmin;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "sys_role_permission", // 中间表名
             joinColumns = @JoinColumn(name = "role_id"), // 当前实体外键

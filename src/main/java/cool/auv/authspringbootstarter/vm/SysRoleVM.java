@@ -29,6 +29,7 @@ public class SysRoleVM extends BaseEntity {
      */
     private String name;
 
+    private String code;
     /**
      * 备注
      */

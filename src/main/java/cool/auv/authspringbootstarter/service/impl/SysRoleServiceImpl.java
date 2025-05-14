@@ -2,7 +2,6 @@ package cool.auv.authspringbootstarter.service.impl;
 
 import cool.auv.authspringbootstarter.entity.SysPermission;
 import cool.auv.authspringbootstarter.entity.SysRole;
-import cool.auv.authspringbootstarter.service.BaseSysRoleServiceImpl;
 import cool.auv.authspringbootstarter.service.SysRoleService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

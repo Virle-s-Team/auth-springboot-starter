@@ -7,7 +7,6 @@ import cool.auv.authspringbootstarter.entity.SysRole;
 import cool.auv.authspringbootstarter.entity.SysUser;
 import cool.auv.authspringbootstarter.mapstruct.BaseSysRoleMapstruct;
 import cool.auv.authspringbootstarter.mapstruct.SysUserUpdateVMMapstruct;
-import cool.auv.authspringbootstarter.service.BaseSysUserServiceImpl;
 import cool.auv.authspringbootstarter.service.SysUserService;
 import cool.auv.authspringbootstarter.utils.PasswordUtil;
 import cool.auv.authspringbootstarter.utils.SecurityContextUtil;

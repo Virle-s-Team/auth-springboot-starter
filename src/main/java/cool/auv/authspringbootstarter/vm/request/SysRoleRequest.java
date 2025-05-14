@@ -35,6 +35,8 @@ public class SysRoleRequest extends BaseEntity implements RequestInterface<SysRo
      */
     private String remark;
 
+    private String code;
+
     private Boolean isSuperAdmin;
 
     @Override
