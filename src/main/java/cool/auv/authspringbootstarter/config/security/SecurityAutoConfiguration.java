@@ -1,5 +1,6 @@
 package cool.auv.authspringbootstarter.config.security;
 
+import cool.auv.authspringbootstarter.config.TenantIdFilter;
 import cool.auv.authspringbootstarter.config.security.jwt.JWTFilter;
 import cool.auv.authspringbootstarter.config.security.jwt.TokenProvider;
 import cool.auv.authspringbootstarter.service.SimpleUserService;
@@ -16,6 +17,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
 
 @Configuration
 @ConditionalOnClass(SecurityFilterChain.class)
@@ -41,6 +43,7 @@ public class SecurityAutoConfiguration {
     public SecurityFilterChain authFilterChain(HttpSecurity http) throws Exception {
         http = configureCommon(http);
         http
+                .addFilterAfter(new TenantIdFilter(), SecurityContextHolderFilter.class)
                 .securityMatcher("/api/v1/auth/**", "/swagger-ui/**", "/v3/api-docs/**")
                 .authorizeHttpRequests(authorize -> authorize
                         .anyRequest().permitAll()

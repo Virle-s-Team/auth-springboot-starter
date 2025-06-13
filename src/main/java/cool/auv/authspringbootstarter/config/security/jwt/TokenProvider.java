@@ -1,6 +1,7 @@
 package cool.auv.authspringbootstarter.config.security.jwt;
 
 import com.google.common.io.BaseEncoding;
+import cool.auv.authspringbootstarter.config.TenantContext;
 import cool.auv.authspringbootstarter.constant.AuthoritiesConstants;
 import cool.auv.authspringbootstarter.entity.SysUser;
 import cool.auv.authspringbootstarter.service.SysUserService;
@@ -65,7 +66,8 @@ public class TokenProvider {
 //        }
         // 获取token类型
         long userId = ((Number) claims.get(AuthoritiesConstants.LOGIN_ACCOUNT_ID)).longValue();
-        String username = (String) claims.get(AuthoritiesConstants.LOGIN_ACCOUNT_NAME);
+        String tenantId = (String) claims.get(AuthoritiesConstants.LOGIN_ACCOUNT_TENANT_ID);
+        TenantContext.setTenantId(tenantId);
         // 设置认证对象
         SysUser sysUser = sysUserService.loadUserWithAuthorities(userId);
         List<SimpleGrantedAuthority> authorities = sysUser.getAuthorities();

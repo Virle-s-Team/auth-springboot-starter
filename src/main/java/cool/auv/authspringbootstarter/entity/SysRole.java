@@ -1,7 +1,7 @@
 package cool.auv.authspringbootstarter.entity;
 
 import cool.auv.codegeneratorjpa.core.annotation.AutoEntity;
-import cool.auv.codegeneratorjpa.core.entity.base.BaseEntity;
+import cool.auv.codegeneratorjpa.core.entity.tenant.TenantBaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,7 +23,7 @@ import java.util.Set;
 @Entity
 @Table(name = "sys_role")
 @AutoEntity(basePath = "/api/v1/sys-role", docTag = "角色管理")
-public class SysRole extends BaseEntity {
+public class SysRole extends TenantBaseEntity {
 
     private static final long serialVersionUID = 1L;
 

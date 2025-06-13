@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import cool.auv.authspringbootstarter.enums.ActiveStatusEnum;
 import cool.auv.authspringbootstarter.enums.GenderEnum;
 import cool.auv.codegeneratorjpa.core.annotation.AutoEntity;
-import cool.auv.codegeneratorjpa.core.entity.base.BaseEntity;
+import cool.auv.codegeneratorjpa.core.entity.tenant.TenantBaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
         docTag = "用户管理",
         controllerExclude = {AutoEntity.ControllerExclude.save, AutoEntity.ControllerExclude.update}
 )
-public class SysUser extends BaseEntity implements Serializable, UserDetails {
+public class SysUser extends TenantBaseEntity implements Serializable, UserDetails {
 
     private static final long serialVersionUID = 1L;
 

@@ -69,6 +69,8 @@ public class SysUserServiceImpl extends BaseSysUserServiceImpl implements SysUse
         Map<String, Object> claims = new HashMap<>();
         //用户名
         claims.put(AuthoritiesConstants.LOGIN_ACCOUNT_NAME, user.getUsername());
+        //tenantId
+        claims.put(AuthoritiesConstants.LOGIN_ACCOUNT_TENANT_ID, user.getTenantId());
         //用户id
         claims.put(AuthoritiesConstants.LOGIN_ACCOUNT_ID, user.getId());
         // 设置token缓存有效时间

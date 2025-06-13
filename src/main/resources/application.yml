@@ -3,7 +3,7 @@ spring:
     name: auth-spring-boot-starter
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://118.89.91.151:3306/code_gen_test?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://118.89.91.151:3306/buy_matrix?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
     username: root
     password: 371982y
     hikari:
@@ -18,6 +18,10 @@ spring:
     hibernate:
       ddl-auto: update
     open-in-view: false
+    properties:
+      hibernate:
+        multiTenancy: DISCRIMINATOR
+        tenant_identifier_resolver: cool.auv.authspringbootstarter.config.CustomTenantIdentifierResolver
 
   security:
     authentication:
@@ -29,7 +33,8 @@ logging:
     org.hibernate.orm.jdbc.bind: trace
 app:
   reset-password: 123456
-
+  tenant:
+    enable: true
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
