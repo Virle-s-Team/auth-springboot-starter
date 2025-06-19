@@ -1,4 +1,4 @@
-package cool.auv.authspringbootstarter.mapstruct;
+package cool.auv.authspringbootstarter.service.mapstruct;
 
 import cool.auv.authspringbootstarter.entity.SysUser;
 import cool.auv.authspringbootstarter.vm.SysUserUpdateVM;

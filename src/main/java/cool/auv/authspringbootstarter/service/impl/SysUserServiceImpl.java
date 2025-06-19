@@ -6,8 +6,8 @@ import cool.auv.authspringbootstarter.entity.SysPermission;
 import cool.auv.authspringbootstarter.entity.SysRole;
 import cool.auv.authspringbootstarter.entity.SysUser;
 import cool.auv.authspringbootstarter.mapstruct.BaseSysRoleMapstruct;
-import cool.auv.authspringbootstarter.mapstruct.SysUserUpdateVMMapstruct;
 import cool.auv.authspringbootstarter.service.SysUserService;
+import cool.auv.authspringbootstarter.service.mapstruct.SysUserUpdateVMMapstruct;
 import cool.auv.authspringbootstarter.utils.PasswordUtil;
 import cool.auv.authspringbootstarter.utils.SecurityContextUtil;
 import cool.auv.authspringbootstarter.vm.LoginVM;
@@ -69,7 +69,6 @@ public class SysUserServiceImpl extends BaseSysUserServiceImpl implements SysUse
         Map<String, Object> claims = new HashMap<>();
         //用户名
         claims.put(AuthoritiesConstants.LOGIN_ACCOUNT_NAME, user.getUsername());
-        //tenantId
         claims.put(AuthoritiesConstants.LOGIN_ACCOUNT_TENANT_ID, user.getTenantId());
         //用户id
         claims.put(AuthoritiesConstants.LOGIN_ACCOUNT_ID, user.getId());

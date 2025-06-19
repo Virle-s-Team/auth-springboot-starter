@@ -1,27 +1,33 @@
 package cool.auv.authspringbootstarter.config;
 
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomizer;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 @Component
-@ConditionalOnProperty(
-        prefix = "app.tenant",
-        name = "enable",
-        havingValue = "true"
-)
-public class CustomTenantIdentifierResolver implements CurrentTenantIdentifierResolver<String> {
+public class CustomTenantIdentifierResolver implements CurrentTenantIdentifierResolver<String>, HibernatePropertiesCustomizer {
 
     @Override
     public String resolveCurrentTenantIdentifier() {
         if (TenantContext.getTenantId() == null) {
-            return "";
+            return "default-tenant";
         }
         return TenantContext.getTenantId();
     }
 
     @Override
     public boolean validateExistingCurrentSessions() {
-        return true; // 通常返回true
+        return true;
+    }
+
+
+    @Override
+    public void customize(Map<String, Object> hibernateProperties) {
+        hibernateProperties.put(
+                "hibernate.tenant_identifier_resolver",
+                this
+        );
     }
 }
