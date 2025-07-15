@@ -29,6 +29,7 @@ logging:
     org.hibernate.orm.jdbc.bind: trace
 app:
   reset-password: 123456
+  default-tenantId: "default-tenant"
 springdoc:
   swagger-ui:
     path: /swagger-ui.html

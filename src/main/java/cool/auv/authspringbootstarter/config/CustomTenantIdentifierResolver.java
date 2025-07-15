@@ -1,6 +1,7 @@
 package cool.auv.authspringbootstarter.config;
 
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomizer;
 import org.springframework.stereotype.Component;
 
@@ -8,11 +9,12 @@ import java.util.Map;
 
 @Component
 public class CustomTenantIdentifierResolver implements CurrentTenantIdentifierResolver<String>, HibernatePropertiesCustomizer {
-
+    @Value("${app.default-tenantId:default-tenant}")
+    private String defaultTenantId;
     @Override
     public String resolveCurrentTenantIdentifier() {
         if (TenantContext.getTenantId() == null) {
-            return "default-tenant";
+            return defaultTenantId;
         }
         return TenantContext.getTenantId();
     }
