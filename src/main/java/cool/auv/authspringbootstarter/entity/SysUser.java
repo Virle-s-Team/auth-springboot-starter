@@ -61,24 +61,9 @@ public class SysUser extends TenantBaseEntity implements Serializable, UserDetai
     private String realName;
 
     /**
-     * 密码
+     * 密码（BCrypt 哈希值）
      */
     private String password;
-
-    /**
-     * md5密码盐
-     */
-    private String salt;
-
-    /**
-     * 加密key
-     */
-    private String secretKey;
-
-    /**
-     * AES 初始向量
-     */
-    private String iv;
 
     /**
      * 头像

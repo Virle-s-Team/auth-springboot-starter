@@ -8,7 +8,6 @@ import cool.auv.authspringbootstarter.entity.SysUser;
 import cool.auv.authspringbootstarter.mapstruct.BaseSysRoleMapstruct;
 import cool.auv.authspringbootstarter.service.SysUserService;
 import cool.auv.authspringbootstarter.service.mapstruct.SysUserUpdateVMMapstruct;
-import cool.auv.authspringbootstarter.utils.PasswordUtil;
 import cool.auv.authspringbootstarter.utils.SecurityContextUtil;
 import cool.auv.authspringbootstarter.vm.LoginVM;
 import cool.auv.authspringbootstarter.vm.SysPermissionTreeVM;
@@ -23,6 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Example;
 import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,27 +52,24 @@ public class SysUserServiceImpl extends BaseSysUserServiceImpl implements SysUse
     @Value("${app.reset-password:123456}")
     private String resetPassword;
 
-    public String login(LoginVM loginVM) throws Exception {
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    public String login(LoginVM loginVM) {
         String username = loginVM.getUsername();
         String password = loginVM.getPassword();
 
-        SysUser user = baseSysUserRepository.findOne(Example.of(new SysUser().setUsername(username))).orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+        SysUser user = baseSysUserRepository.findOne(Example.of(new SysUser().setUsername(username)))
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
-        String genPwd = PasswordUtil.encrypt(password, user.getSecretKey(), user.getSalt(), user.getIv());
-        String origin = user.getPassword();
-
-        if (!origin.equals(genPwd)) {
+        if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new AuthenticationServiceException("用户名或密码错误");
         }
 
         // 生成token
         Map<String, Object> claims = new HashMap<>();
-        //用户名
         claims.put(AuthoritiesConstants.LOGIN_ACCOUNT_NAME, user.getUsername());
         claims.put(AuthoritiesConstants.LOGIN_ACCOUNT_TENANT_ID, user.getTenantId());
-        //用户id
         claims.put(AuthoritiesConstants.LOGIN_ACCOUNT_ID, user.getId());
-        // 设置token缓存有效时间
         return tokenProvider.createJWT(claims);
     }
 
@@ -146,87 +143,50 @@ public class SysUserServiceImpl extends BaseSysUserServiceImpl implements SysUse
 
     @Override
     @Transactional
-    public void save(SysUserUpdateVM sysUserVM) throws AppException {
+    public void save(SysUserUpdateVM sysUserVM) {
         SysUser sysUser = sysUserUpdateVMMapstruct.vmToEntity(sysUserVM);
-        String salt = PasswordUtil.generateSalt();
-        String key = PasswordUtil.generateKey();
-        String iv = PasswordUtil.generateIV();
-        sysUser.setSalt(salt);
-        sysUser.setSecretKey(key);
-        sysUser.setIv(iv);
+
         if (StringUtils.isNotEmpty(sysUser.getPassword())) {
-            String encrypt = PasswordUtil.encrypt(sysUser.getPassword(), key, salt, iv);
-            sysUser.setPassword(encrypt);
+            sysUser.setPassword(passwordEncoder.encode(sysUser.getPassword()));
         } else {
-            String encrypt = PasswordUtil.encrypt(resetPassword, key, salt, iv);
-            sysUser.setPassword(encrypt);
+            sysUser.setPassword(passwordEncoder.encode(resetPassword));
         }
+
         baseSysUserRepository.save(sysUser);
     }
 
     @Override
     @Transactional
-    public void update(SysUserUpdateVM sysUserVM) throws AppException {
+    public void update(SysUserUpdateVM sysUserVM) {
         baseSysUserRepository.findById(sysUserVM.getId()).ifPresent(sysUser -> {
-            // 如果前端没修改密码 保留原密码防止被空值替换
-            if (StringUtils.isEmpty(sysUserVM.getPassword())) {
-                sysUserVM.setPassword(sysUser.getPassword());
-            }
-            // 否则加密新密码
-            else {
-                try {
-                    String salt = sysUser.getSalt();
-                    String key = sysUser.getSecretKey();
-                    String iv = sysUser.getIv();
-
-                    String encrypt = PasswordUtil.encrypt(sysUserVM.getPassword(), key, salt, iv);
-                    sysUserVM.setPassword(encrypt);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+            // 只在提供新密码时更新
+            if (StringUtils.isNotEmpty(sysUserVM.getPassword())) {
+                sysUser.setPassword(passwordEncoder.encode(sysUserVM.getPassword()));
             }
             sysUserUpdateVMMapstruct.updateEntityFromVM(sysUserVM, sysUser);
         });
-
-
     }
 
     @Override
     @Transactional
     public void resetPassword(Long userId) {
         baseSysUserRepository.findById(userId).ifPresent(sysUser -> {
-            if (StringUtils.isNotEmpty(sysUser.getPassword())) {
-                try {
-                    String salt = sysUser.getSalt();
-                    String key = sysUser.getSecretKey();
-                    String iv = sysUser.getIv();
-
-                    String encrypt = PasswordUtil.encrypt(resetPassword, key, salt, iv);
-                    sysUser.setPassword(encrypt);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
+            sysUser.setPassword(passwordEncoder.encode(resetPassword));
+            baseSysUserRepository.save(sysUser);
         });
     }
 
     @Override
     @Transactional
     public void updatePassword(String oldPassword, String newPassword) throws AppException {
-        Optional<SysUser> currentUser = SecurityContextUtil.getCurrentUser();
-        SysUser sysUser = currentUser.orElseThrow(() -> new AppException("当前用户信息获取失败"));
-        String salt = sysUser.getSalt();
-        String key = sysUser.getSecretKey();
-        String iv = sysUser.getIv();
-        // 加密前台的旧密码
-        String webPwdEncrypt = PasswordUtil.encrypt(oldPassword, key, salt, iv);
-        if (webPwdEncrypt.equals(sysUser.getPassword())) {
-            // 加密新密码
-            String encrypt = PasswordUtil.encrypt(newPassword, key, salt, iv);
-            sysUser.setPassword(encrypt);
-            baseSysUserRepository.save(sysUser);
-        } else {
+        SysUser sysUser = SecurityContextUtil.getCurrentUser()
+                .orElseThrow(() -> new AppException("当前用户信息获取失败"));
+
+        if (!passwordEncoder.matches(oldPassword, sysUser.getPassword())) {
             throw new AppException("旧密码错误");
         }
+
+        sysUser.setPassword(passwordEncoder.encode(newPassword));
+        baseSysUserRepository.save(sysUser);
     }
 }
