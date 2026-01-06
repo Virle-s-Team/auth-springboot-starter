@@ -126,12 +126,42 @@ public class SysUser extends TenantBaseEntity { ... }
 
 ## 重要依赖
 
-- **code-generator-jpa 0.0.1-SNAPSHOT**：代码生成核心，注解处理器已配置在 maven-compiler-plugin
-- **Lombok 1.18.24**：已配置为注解处理器
-- **MapStruct 1.5.5.Final**：已配置为注解处理器
-- **hibernate-jpamodelgen**：已配置为注解处理器
+### 自身核心依赖
 
-**注意**：使用本 Starter 的项目无需重复配置这些注解处理器。
+- **Spring Boot Starter Security**：认证授权核心框架
+- **Spring Boot Autoconfigure**：自动配置支持
+- **JWT (jjwt 0.12.6)**：Token 生成与验证（api/impl/jackson 三个模块）
+- **SpringDoc OpenAPI 2.8.5**：API 文档生成（springdoc-openapi-starter-webmvc-ui）
+
+### 来自 code-generator-jpa 的传递依赖
+
+**框架与数据库**：
+- **Spring Boot Starter Data JPA**：JPA 数据访问
+- **MySQL Connector 8.0.33**：MySQL 数据库驱动
+- **Spring Context/Web/WebMVC/Beans 6.2.3**：Spring 核心模块（显式版本）
+
+**工具库**：
+- **Apache Commons Lang3 3.17.0**：通用工具类
+- **JetBrains Annotations 24.0.1**：IDE 注解支持
+- **Jackson (Databind 2.18.2 / Annotations 2.18.2 / Dataformat YAML 2.17.2)**：JSON/YAML 处理
+- **Swagger Annotations 2.2.28**：OpenAPI 3 注解（用于生成代码中的 API 文档）
+- **Logback Classic 1.5.16**：日志实现
+
+**代码生成相关**：
+- **Auto Service 1.0**（Google）：注解处理器自动注册
+- **Auto Value 1.7.4**（Google）：不可变对象生成
+
+### 注解处理器配置
+
+**已配置在 maven-compiler-plugin 中**：
+- **code-generator-jpa 0.0.1-SNAPSHOT**：核心代码生成注解处理器
+- **Lombok 1.18.24**：代码简化注解处理器
+- **MapStruct Processor 1.5.5.Final**：对象映射注解处理器
+- **hibernate-jpamodelgen**：JPA Metamodel 生成器
+
+**注意**：
+- 使用本 Starter 的项目无需重复配置上述注解处理器
+- code-generator-jpa 内部已包含 auto-service、mapstruct 等注解处理器配置
 
 ## 配置文件位置
 
