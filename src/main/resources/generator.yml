@@ -1,8 +1,6 @@
 auto-processor:
   entity:
     package-name: cool.auv.authspringbootstarter.entity
-    super-class: true
-    extend-from: cool.auv.gen.entity.BaseEntity
   vm:
     package-name: cool.auv.authspringbootstarter.vm
   body:
@@ -18,5 +16,3 @@ auto-processor:
     impl-package-name: cool.auv.authspringbootstarter.service.impl
   controller:
     package-name: cool.auv.authspringbootstarter.controller
-  enums:
-    package-name: cool.auv.authspringbootstarter.enums
