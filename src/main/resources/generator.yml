@@ -3,8 +3,6 @@ auto-processor:
     package-name: cool.auv.authspringbootstarter.entity
   vm:
     package-name: cool.auv.authspringbootstarter.vm
-  body:
-    package-name: cool.auv.authspringbootstarter.vm.body
   request:
     package-name: cool.auv.authspringbootstarter.vm.request
   repository:
