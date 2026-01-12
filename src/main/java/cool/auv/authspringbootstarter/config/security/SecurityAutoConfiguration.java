@@ -7,6 +7,7 @@ import cool.auv.authspringbootstarter.service.SimpleUserService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -19,11 +20,16 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.SecurityContextHolderFilter;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
+
 @Configuration
 @ConditionalOnClass(SecurityFilterChain.class)
 @ComponentScan(basePackages = "cool.auv.authspringbootstarter")
 @EnableJpaRepositories(basePackages = "cool.auv.authspringbootstarter.repository")
 @EntityScan(basePackages = "cool.auv.authspringbootstarter.entity")
+@EnableConfigurationProperties(SecurityProperties.class)
 public class SecurityAutoConfiguration {
 
     @Bean
@@ -40,11 +46,21 @@ public class SecurityAutoConfiguration {
 
     @Bean
     @Order(1)
-    public SecurityFilterChain authFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain authFilterChain(HttpSecurity http, SecurityProperties properties) throws Exception {
         http = configureCommon(http);
+
+        // 合并默认公开路径和配置的公开路径
+        List<String> defaultPaths = Arrays.asList("/api/v1/auth/**", "/swagger-ui/**", "/v3/api-docs/**");
+        List<String> configuredPaths = properties.getPublicPaths();
+
+        String[] allPaths = Stream.concat(defaultPaths.stream(),
+                configuredPaths != null ? configuredPaths.stream() : Stream.empty())
+                .distinct()
+                .toArray(String[]::new);
+
         http
                 .addFilterAfter(new TenantIdFilter(), SecurityContextHolderFilter.class)
-                .securityMatcher("/api/v1/auth/**", "/swagger-ui/**", "/v3/api-docs/**")
+                .securityMatcher(allPaths)
                 .authorizeHttpRequests(authorize -> authorize
                         .anyRequest().permitAll()
                 );
