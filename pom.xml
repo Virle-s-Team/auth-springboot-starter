@@ -10,7 +10,7 @@
     </parent>
     <groupId>cool.auv</groupId>
     <artifactId>auth-spring-boot-starter</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
     <name>auth-spring-boot-starter</name>
     <description>auth-spring-boot-starter</description>
     <url/>
@@ -68,7 +68,7 @@
         <dependency>
             <groupId>cool.auv</groupId>
             <artifactId>code-generator-jpa</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.2-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -141,7 +141,7 @@
                         <path>
                             <groupId>cool.auv</groupId>
                             <artifactId>code-generator-jpa</artifactId>
-                            <version>0.0.1-SNAPSHOT</version>
+                            <version>0.0.2-SNAPSHOT</version>
                         </path>
 
                         <path>
