@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 @AutoEntity(
         basePath = "/api/v1/sys-user",
         docTag = "用户管理",
-        controllerExclude = {AutoEntity.ControllerExclude.save, AutoEntity.ControllerExclude.update}
+        enableMapperAnnotation = false
 )
 public class SysUser extends TenantBaseEntity implements Serializable, UserDetails {
 

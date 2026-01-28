@@ -1,16 +1,15 @@
 package cool.auv.authspringbootstarter.service;
 
 import cool.auv.authspringbootstarter.entity.SysUser;
-import cool.auv.authspringbootstarter.vm.LoginVM;
-import cool.auv.authspringbootstarter.vm.SysPermissionTreeVM;
-import cool.auv.authspringbootstarter.vm.SysRoleVM;
-import cool.auv.authspringbootstarter.vm.SysUserUpdateVM;
+import cool.auv.authspringbootstarter.vm.*;
+import cool.auv.authspringbootstarter.vm.request.SysUserRequest;
+import cool.auv.codegeneratorjpa.core.base.BaseAutoService;
 import cool.auv.codegeneratorjpa.core.exception.AppException;
 
 import java.util.Optional;
 import java.util.Set;
 
-public interface SysUserService extends BaseSysUserService{
+public interface SysUserService extends BaseAutoService<SysUser, Long, SysUserRequest, SysUserVM> {
 
     String login(LoginVM loginVM) throws Exception;
 

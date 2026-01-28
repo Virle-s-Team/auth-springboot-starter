@@ -6,13 +6,13 @@ import cool.auv.authspringbootstarter.entity.SysPermission;
 import cool.auv.authspringbootstarter.entity.SysRole;
 import cool.auv.authspringbootstarter.entity.SysUser;
 import cool.auv.authspringbootstarter.mapstruct.BaseSysRoleMapstruct;
+import cool.auv.authspringbootstarter.repository.BaseSysUserRepository;
 import cool.auv.authspringbootstarter.service.SysUserService;
-import cool.auv.authspringbootstarter.service.mapstruct.SysUserUpdateVMMapstruct;
 import cool.auv.authspringbootstarter.utils.SecurityContextUtil;
-import cool.auv.authspringbootstarter.vm.LoginVM;
-import cool.auv.authspringbootstarter.vm.SysPermissionTreeVM;
-import cool.auv.authspringbootstarter.vm.SysRoleVM;
-import cool.auv.authspringbootstarter.vm.SysUserUpdateVM;
+import cool.auv.authspringbootstarter.vm.*;
+import cool.auv.authspringbootstarter.vm.request.SysUserRequest;
+import cool.auv.codegeneratorjpa.core.base.AbstractAutoService;
+import cool.auv.codegeneratorjpa.core.base.CustomServiceMarker;
 import cool.auv.codegeneratorjpa.core.exception.AppException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -22,8 +22,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Example;
 import org.springframework.security.authentication.AuthenticationServiceException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +34,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class SysUserServiceImpl extends BaseSysUserServiceImpl implements SysUserService {
+public class SysUserServiceImpl extends AbstractAutoService<SysUser, Long, SysUserRequest, SysUserVM> implements SysUserService, CustomServiceMarker<SysUser> {
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -47,7 +47,7 @@ public class SysUserServiceImpl extends BaseSysUserServiceImpl implements SysUse
     private BaseSysRoleMapstruct baseSysRoleMapstruct;
 
     @Autowired
-    private SysUserUpdateVMMapstruct sysUserUpdateVMMapstruct;
+    private BaseSysUserRepository baseSysUserRepository;
 
     @Value("${app.reset-password:123456}")
     private String resetPassword;
@@ -106,7 +106,7 @@ public class SysUserServiceImpl extends BaseSysUserServiceImpl implements SysUse
     @Transactional(readOnly = true)
     @Override
     public Optional<Set<SysRoleVM>> getRole(Long userId) {
-        return baseSysUserRepository.findById(userId).map(user -> user.getRoleSet().stream().map(baseSysRoleMapstruct::entityToVm).collect(Collectors.toSet()));
+        return baseSysUserRepository.findById(userId).map(user -> user.getRoleSet().stream().map(baseSysRoleMapstruct::entityToVM).collect(Collectors.toSet()));
     }
 
     @Override
@@ -144,7 +144,7 @@ public class SysUserServiceImpl extends BaseSysUserServiceImpl implements SysUse
     @Override
     @Transactional
     public void save(SysUserUpdateVM sysUserVM) {
-        SysUser sysUser = sysUserUpdateVMMapstruct.vmToEntity(sysUserVM);
+        SysUser sysUser = mapstruct.vmToEntity(sysUserVM);
 
         if (StringUtils.isNotEmpty(sysUser.getPassword())) {
             sysUser.setPassword(passwordEncoder.encode(sysUser.getPassword()));
@@ -163,7 +163,7 @@ public class SysUserServiceImpl extends BaseSysUserServiceImpl implements SysUse
             if (StringUtils.isNotEmpty(sysUserVM.getPassword())) {
                 sysUser.setPassword(passwordEncoder.encode(sysUserVM.getPassword()));
             }
-            sysUserUpdateVMMapstruct.updateEntityFromVM(sysUserVM, sysUser);
+//            sysUserUpdateVMMapstruct.updateEntityFromVM(sysUserVM, sysUser);
         });
     }
 
