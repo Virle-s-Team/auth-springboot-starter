@@ -35,7 +35,7 @@ public class CurrentUserController {
         Optional<Set<SysRole>> sysRoles = currentUser.map(SysUser::getRoleSet);
         Optional<Set<SysRoleVM>> sysRoleVMS = sysRoles.map(roleSet -> roleSet.stream().map(sysRole -> {
             sysRole.setPermissionSet(new HashSet<>());
-            return baseSysRoleMapstruct.entityToVm(sysRole);
+            return baseSysRoleMapstruct.entityToVM(sysRole);
         }).collect(Collectors.toSet()));
         return ResponseUtil.wrapOrNotFound(sysRoleVMS);
     }
