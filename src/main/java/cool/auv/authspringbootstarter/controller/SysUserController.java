@@ -1,22 +1,18 @@
 package cool.auv.authspringbootstarter.controller;
 
 import cool.auv.authspringbootstarter.entity.SysUser;
-import cool.auv.authspringbootstarter.service.BaseSysUserService;
 import cool.auv.authspringbootstarter.service.SysUserService;
 import cool.auv.authspringbootstarter.vm.SysRoleVM;
 import cool.auv.authspringbootstarter.vm.SysUserVM;
 import cool.auv.authspringbootstarter.vm.request.SysUserRequest;
 import cool.auv.codegeneratorjpa.core.base.AbstractCrudController;
 import cool.auv.codegeneratorjpa.core.base.CustomControllerMarker;
-import cool.auv.codegeneratorjpa.core.exception.AppException;
 import cool.auv.codegeneratorjpa.core.utils.ResponseUtil;
-import cool.auv.codegeneratorjpa.core.vm.PageSortRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
