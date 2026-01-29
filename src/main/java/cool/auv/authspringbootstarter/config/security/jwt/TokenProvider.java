@@ -1,6 +1,5 @@
 package cool.auv.authspringbootstarter.config.security.jwt;
 
-import com.google.common.io.BaseEncoding;
 import cool.auv.authspringbootstarter.config.TenantContext;
 import cool.auv.authspringbootstarter.constant.AuthoritiesConstants;
 import cool.auv.authspringbootstarter.entity.SysUser;
@@ -51,12 +50,9 @@ public class TokenProvider {
 //            return false;
 //        }
         Claims claims = verifyJwt(authToken);
-        if (Objects.nonNull(claims)) {
-//            //延长token有效期
-//            redisService.expire(CommonConstant.PREFIX_USER_TOKEN + authToken, JwtUtil.getExpiration() * 2 / 1000);
-            return true;
-        }
-        return false;
+        //            //延长token有效期
+        //            redisService.expire(CommonConstant.PREFIX_USER_TOKEN + authToken, JwtUtil.getExpiration() * 2 / 1000);
+        return Objects.nonNull(claims);
     }
 
     public Authentication getAuthentication(String token) {
@@ -120,7 +116,7 @@ public class TokenProvider {
 
         byte[] keyBytes;
         try {
-            keyBytes = BaseEncoding.base64().decode(jwtSecret);
+            keyBytes = Base64.getDecoder().decode(jwtSecret);
             log.debug("Using Base64-decoded secret key, length: {}", keyBytes.length);
         } catch (IllegalArgumentException e) {
             log.debug("Secret is not Base64-encoded, treating as plain text: {}", jwtSecret);
