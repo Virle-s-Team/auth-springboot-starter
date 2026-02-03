@@ -29,7 +29,8 @@ public class SysPermission implements Serializable {
     /**
      * 父id
      */
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
     private SysPermission parent;
 
     /**
