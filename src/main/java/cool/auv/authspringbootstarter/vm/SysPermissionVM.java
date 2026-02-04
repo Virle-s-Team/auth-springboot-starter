@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -93,5 +94,9 @@ public class SysPermissionVM implements Serializable {
      */
     private String icon;
 
+    /**
+     * 子权限列表（用于树状结构返回）
+     */
+    private Set<SysPermissionVM> children;
 
 }
