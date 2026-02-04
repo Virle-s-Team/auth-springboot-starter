@@ -14,7 +14,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -34,7 +33,6 @@ public class CurrentUserController {
         Optional<SysUser> currentUser = SecurityContextUtil.getCurrentUser();
         Optional<Set<SysRole>> sysRoles = currentUser.map(SysUser::getRoleSet);
         Optional<Set<SysRoleVM>> sysRoleVMS = sysRoles.map(roleSet -> roleSet.stream().map(sysRole -> {
-            sysRole.setPermissionSet(new HashSet<>());
             return baseSysRoleMapstruct.entityToVM(sysRole);
         }).collect(Collectors.toSet()));
         return ResponseUtil.wrapOrNotFound(sysRoleVMS);
