@@ -118,30 +118,15 @@ public class SysUser extends TenantBaseEntity implements Serializable, UserDetai
 
     /**
      * 获取用户的所有权限（包括直接权限和角色权限）
-     * 只返回类型为 PERMISSION 的权限，过滤掉 MENU 类型的菜单项
      *
      * @return 用户的所有有效权限
      */
     public Set<SysPermission> getAllPermission() {
-        Set<SysPermission> allPermissions = new HashSet<>();
-
-        // 添加用户直接拥有的权限
-        if (permissionSet != null) {
-            permissionSet.stream()
-                    .filter(permission -> "PERMISSION".equals(permission.getMenuType()))
-                    .forEach(allPermissions::add);
-        }
-
-        // 添加通过角色获得的权限
-        if (roleSet != null) {
-            roleSet.stream()
-                    .filter(role -> role.getPermissionSet() != null)
-                    .flatMap(role -> role.getPermissionSet().stream())
-                    .filter(permission -> "PERMISSION".equals(permission.getMenuType()))
-                    .forEach(allPermissions::add);
-        }
-
-        return allPermissions;
+        Set<SysPermission> rolePermission = roleSet.stream().flatMap(role -> role.getPermissionSet().stream()).collect(Collectors.toSet());
+        Set<SysPermission> allPermission = new HashSet<>();
+        allPermission.addAll(permissionSet);
+        allPermission.addAll(rolePermission);
+        return allPermission;
     }
 
     /**
