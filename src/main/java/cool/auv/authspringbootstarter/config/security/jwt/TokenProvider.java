@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -67,7 +67,7 @@ public class TokenProvider {
         TenantContext.setTenantId(tenantId);
         // 设置认证对象
         SysUser sysUser = sysUserService.loadUserWithAuthorities(userId);
-        List<SimpleGrantedAuthority> authorities = sysUser.getAuthorities();
+        Collection<? extends GrantedAuthority> authorities = sysUser.getAuthorities();
         return new UsernamePasswordAuthenticationToken(sysUser, token, authorities);
 
     }

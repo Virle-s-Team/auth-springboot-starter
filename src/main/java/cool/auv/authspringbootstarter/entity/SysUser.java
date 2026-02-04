@@ -10,13 +10,14 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -115,18 +116,99 @@ public class SysUser extends TenantBaseEntity implements Serializable, UserDetai
     )
     private Set<SysPermission> permissionSet;
 
+    /**
+     * 获取用户的所有权限（包括直接权限和角色权限）
+     * 只返回类型为 PERMISSION 的权限，过滤掉 MENU 类型的菜单项
+     *
+     * @return 用户的所有有效权限
+     */
     public Set<SysPermission> getAllPermission() {
-        Set<SysPermission> rolePermission = roleSet.stream().flatMap(role -> role.getPermissionSet().stream()).collect(Collectors.toSet());
-        Set<SysPermission> allPermission = new HashSet<>();
-        allPermission.addAll(permissionSet);
-        allPermission.addAll(rolePermission);
-        return allPermission;
+        Set<SysPermission> allPermissions = new HashSet<>();
+
+        // 添加用户直接拥有的权限
+        if (permissionSet != null) {
+            permissionSet.stream()
+                    .filter(permission -> "PERMISSION".equals(permission.getMenuType()))
+                    .forEach(allPermissions::add);
+        }
+
+        // 添加通过角色获得的权限
+        if (roleSet != null) {
+            roleSet.stream()
+                    .filter(role -> role.getPermissionSet() != null)
+                    .flatMap(role -> role.getPermissionSet().stream())
+                    .filter(permission -> "PERMISSION".equals(permission.getMenuType()))
+                    .forEach(allPermissions::add);
+        }
+
+        return allPermissions;
     }
 
+    /**
+     * 获取 Spring Security 需要的权限列表
+     * 将权限标识转换为 SimpleGrantedAuthority 对象
+     *
+     * @return 权限列表，如果用户没有权限则返回空列表
+     */
     @Override
-    public List<SimpleGrantedAuthority> getAuthorities() {
-        Set<SysPermission> allPermission = getAllPermission();
-        return allPermission.stream().map(permission -> new SimpleGrantedAuthority(permission.getPermission())).toList();
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return getAllPermission().stream()
+                .map(SysPermission::getPermission)
+                .filter(permission -> permission != null && !permission.isEmpty())
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 获取用户名
+     *
+     * @return 用户名
+     */
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
+    /**
+     * 账户是否未过期
+     *
+     * @return true
+     */
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    /**
+     * 账户是否未锁定
+     * 根据用户状态判断，ACTIVE 状态返回 true
+     *
+     * @return true 如果账户未锁定
+     */
+    @Override
+    public boolean isAccountNonLocked() {
+        return status == ActiveStatusEnum.ACTIVE;
+    }
+
+    /**
+     * 凭证（密码）是否未过期
+     *
+     * @return true
+     */
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    /**
+     * 账户是否启用
+     * 根据用户状态判断，ACTIVE 状态返回 true
+     *
+     * @return true 如果账户启用
+     */
+    @Override
+    public boolean isEnabled() {
+        return status == ActiveStatusEnum.ACTIVE;
     }
 
 }
