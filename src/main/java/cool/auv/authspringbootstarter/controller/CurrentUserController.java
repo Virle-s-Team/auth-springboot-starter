@@ -1,9 +1,7 @@
 package cool.auv.authspringbootstarter.controller;
 
 import cool.auv.authspringbootstarter.entity.SysRole;
-import cool.auv.authspringbootstarter.entity.SysUser;
 import cool.auv.authspringbootstarter.service.SysUserService;
-import cool.auv.authspringbootstarter.utils.SecurityContextUtil;
 import cool.auv.authspringbootstarter.vm.SysPermissionTreeVM;
 import cool.auv.authspringbootstarter.vm.SysRoleVM;
 import cool.auv.codegeneratorjpa.core.base.BaseAutoMapstruct;
@@ -16,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/current-user")
@@ -30,12 +27,8 @@ public class CurrentUserController {
 
     @GetMapping("/get-role")
     public ResponseEntity<Set<SysRoleVM>> getCurrentRole() {
-        Optional<SysUser> currentUser = SecurityContextUtil.getCurrentUser();
-        Optional<Set<SysRole>> sysRoles = currentUser.map(SysUser::getRoleSet);
-        Optional<Set<SysRoleVM>> sysRoleVMS = sysRoles.map(roleSet -> roleSet.stream().map(sysRole -> {
-            return baseSysRoleMapstruct.entityToVM(sysRole);
-        }).collect(Collectors.toSet()));
-        return ResponseUtil.wrapOrNotFound(sysRoleVMS);
+        Optional<Set<SysRoleVM>> currentUserRole = sysUserService.getCurrentUserRole();
+        return ResponseUtil.wrapOrNotFound(currentUserRole);
     }
 
     @GetMapping("/permissions")

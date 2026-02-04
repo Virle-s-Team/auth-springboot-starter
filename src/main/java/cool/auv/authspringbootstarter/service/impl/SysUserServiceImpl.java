@@ -122,22 +122,19 @@ public class SysUserServiceImpl extends AbstractAutoService<SysUser, Long, SysUs
     @Override
     public Optional<Set<SysPermissionTreeVM>> getCurrentUserPermission() {
         // 获取用户的所有权限
-        Optional<SysUser> currentUser = SecurityContextUtil.getCurrentUser();
+        SysUser currentUser = SecurityContextUtil.getCurrentUser().orElseThrow(() -> new AppException("获取当前登录用户失败"));
         // 构建树状结构
-        return currentUser.map(sysUser -> {
+        Set<SysPermission> allPermission = currentUser.getAllPermission();
+        // 过滤出顶级权限
+        Set<SysPermission> topPermission = allPermission.stream().filter(permission -> permission.getParent() == null).collect(Collectors.toSet());
 
-            Set<SysPermission> allPermission = sysUser.getAllPermission();
-            // 过滤出顶级权限
-            Set<SysPermission> topPermission = allPermission.stream().filter(permission -> permission.getParent() == null).collect(Collectors.toSet());
+        return Optional.of(topPermission.stream().map(permission -> {
+            // 根据当前的permission获取子permission
+            Set<SysPermission> children = allPermission.stream().filter(item -> item.getParent() != null && permission.getId().equals(item.getParent().getId())).collect(Collectors.toSet());
+            // 构建vm
+            return new SysPermissionTreeVM().setPermission(permission).setChildren(children);
+        }).collect(Collectors.toSet()));
 
-            return topPermission.stream().map(permission -> {
-                // 根据当前的permission获取子permission
-                Set<SysPermission> children = allPermission.stream().filter(item -> item.getParent() != null && permission.getId().equals(item.getParent().getId())).collect(Collectors.toSet());
-                // 构建vm
-                return new SysPermissionTreeVM().setPermission(permission).setChildren(children);
-            }).collect(Collectors.toSet());
-
-        });
     }
 
 
@@ -188,5 +185,14 @@ public class SysUserServiceImpl extends AbstractAutoService<SysUser, Long, SysUs
 
         sysUser.setPassword(passwordEncoder.encode(newPassword));
         baseSysUserRepository.save(sysUser);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Set<SysRoleVM>> getCurrentUserRole() {
+        Optional<SysUser> currentUser = SecurityContextUtil.getCurrentUser();
+        Optional<Set<SysRole>> sysRoles = currentUser.map(SysUser::getRoleSet);
+        Optional<Set<SysRoleVM>> sysRoleVMS = sysRoles.map(roleSet -> roleSet.stream().map(sysRole -> baseSysRoleMapstruct.entityToVM(sysRole)).collect(Collectors.toSet()));
+        return sysRoleVMS;
     }
 }

@@ -34,4 +34,6 @@ public interface SysUserService extends BaseAutoService<SysUser, Long, SysUserRe
     void resetPassword(Long userId);
 
     void updatePassword(String oldPassword, String newPassword) throws AppException;
+
+    Optional<Set<SysRoleVM>> getCurrentUserRole();
 }
