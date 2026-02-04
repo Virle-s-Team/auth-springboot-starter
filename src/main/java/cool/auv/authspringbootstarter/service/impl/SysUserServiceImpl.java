@@ -5,13 +5,13 @@ import cool.auv.authspringbootstarter.constant.AuthoritiesConstants;
 import cool.auv.authspringbootstarter.entity.SysPermission;
 import cool.auv.authspringbootstarter.entity.SysRole;
 import cool.auv.authspringbootstarter.entity.SysUser;
-import cool.auv.authspringbootstarter.mapstruct.BaseSysRoleMapstruct;
-import cool.auv.authspringbootstarter.repository.BaseSysUserRepository;
 import cool.auv.authspringbootstarter.service.SysUserService;
 import cool.auv.authspringbootstarter.utils.SecurityContextUtil;
 import cool.auv.authspringbootstarter.vm.*;
 import cool.auv.authspringbootstarter.vm.request.SysUserRequest;
 import cool.auv.codegeneratorjpa.core.base.AbstractAutoService;
+import cool.auv.codegeneratorjpa.core.base.BaseAutoMapstruct;
+import cool.auv.codegeneratorjpa.core.base.BaseRepository;
 import cool.auv.codegeneratorjpa.core.base.CustomServiceMarker;
 import cool.auv.codegeneratorjpa.core.exception.AppException;
 import jakarta.persistence.EntityManager;
@@ -44,10 +44,10 @@ public class SysUserServiceImpl extends AbstractAutoService<SysUser, Long, SysUs
     private TokenProvider tokenProvider;
 
     @Autowired
-    private BaseSysRoleMapstruct baseSysRoleMapstruct;
+    private BaseAutoMapstruct<SysRole, SysRoleVM> baseSysRoleMapstruct;
 
     @Autowired
-    private BaseSysUserRepository baseSysUserRepository;
+    private BaseRepository<SysUser, Long> baseSysUserRepository;
 
     @Value("${app.reset-password:123456}")
     private String resetPassword;

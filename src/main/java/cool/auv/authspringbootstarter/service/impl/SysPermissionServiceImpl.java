@@ -1,12 +1,12 @@
 package cool.auv.authspringbootstarter.service.impl;
 
 import cool.auv.authspringbootstarter.entity.SysPermission;
-import cool.auv.authspringbootstarter.mapstruct.BaseSysPermissionMapstruct;
-import cool.auv.authspringbootstarter.repository.BaseSysPermissionRepository;
 import cool.auv.authspringbootstarter.service.SysPermissionService;
 import cool.auv.authspringbootstarter.vm.SysPermissionVM;
 import cool.auv.authspringbootstarter.vm.request.SysPermissionRequest;
 import cool.auv.codegeneratorjpa.core.base.AbstractAutoService;
+import cool.auv.codegeneratorjpa.core.base.BaseAutoMapstruct;
+import cool.auv.codegeneratorjpa.core.base.BaseRepository;
 import cool.auv.codegeneratorjpa.core.base.CustomServiceMarker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,10 +21,10 @@ public class SysPermissionServiceImpl extends AbstractAutoService<SysPermission,
         implements SysPermissionService, CustomServiceMarker<SysPermission> {
 
     @Autowired
-    private BaseSysPermissionRepository baseSysPermissionRepository;
+    private BaseRepository<SysPermission, Long> baseSysPermissionRepository;
 
     @Autowired
-    private BaseSysPermissionMapstruct baseSysPermissionMapstruct;
+    private BaseAutoMapstruct<SysPermission, SysPermissionVM> baseSysPermissionMapstruct;
 
     @Override
     public Set<SysPermissionVM> getPermissionTree() {
