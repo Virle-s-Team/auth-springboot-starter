@@ -5,6 +5,7 @@ import cool.auv.authspringbootstarter.constant.AuthoritiesConstants;
 import cool.auv.authspringbootstarter.entity.SysPermission;
 import cool.auv.authspringbootstarter.entity.SysRole;
 import cool.auv.authspringbootstarter.entity.SysUser;
+import cool.auv.authspringbootstarter.security.principal.SimpleUser;
 import cool.auv.authspringbootstarter.service.SysUserService;
 import cool.auv.authspringbootstarter.utils.SecurityContextUtil;
 import cool.auv.authspringbootstarter.vm.*;
@@ -114,15 +115,22 @@ public class SysUserServiceImpl extends AbstractAutoService<SysUser, Long, SysUs
     public SysUser loadUserWithAuthorities(Long userId) {
         SysUser sysUser = baseSysUserRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        sysUser.getAuthorities(); // 触发懒加载
+        sysUser.getAllPermission(); // 触发懒加载，加载所有权限和角色
         return sysUser;
     }
 
     @Transactional(readOnly = true)
     @Override
     public Optional<Set<SysPermissionTreeVM>> getCurrentUserPermission() {
-        // 获取用户的所有权限
-        SysUser currentUser = SecurityContextUtil.getCurrentUser().orElseThrow(() -> new AppException("获取当前登录用户失败"));
+        // 获取当前用户 ID
+        Long userId = SecurityContextUtil.getCurrentUser()
+                .map(SimpleUser::getUserId)
+                .orElseThrow(() -> new AppException("获取当前登录用户失败"));
+
+        // 重新查询用户以获取完整的权限实体对象
+        SysUser currentUser = baseSysUserRepository.findById(userId)
+                .orElseThrow(() -> new AppException("用户不存在"));
+
         // 构建树状结构
         Set<SysPermission> allPermission = currentUser.getAllPermission();
         // 过滤出顶级权限
@@ -176,8 +184,14 @@ public class SysUserServiceImpl extends AbstractAutoService<SysUser, Long, SysUs
     @Override
     @Transactional
     public void updatePassword(String oldPassword, String newPassword) throws AppException {
-        SysUser sysUser = SecurityContextUtil.getCurrentUser()
+        // 获取当前用户 ID
+        Long userId = SecurityContextUtil.getCurrentUser()
+                .map(SimpleUser::getUserId)
                 .orElseThrow(() -> new AppException("当前用户信息获取失败"));
+
+        // 查询用户实体
+        SysUser sysUser = baseSysUserRepository.findById(userId)
+                .orElseThrow(() -> new AppException("用户不存在"));
 
         if (!passwordEncoder.matches(oldPassword, sysUser.getPassword())) {
             throw new AppException("旧密码错误");
@@ -190,9 +204,15 @@ public class SysUserServiceImpl extends AbstractAutoService<SysUser, Long, SysUs
     @Override
     @Transactional(readOnly = true)
     public Optional<Set<SysRoleVM>> getCurrentUserRole() {
-        Optional<SysUser> currentUser = SecurityContextUtil.getCurrentUser();
-        Optional<Set<SysRole>> sysRoles = currentUser.map(SysUser::getRoleSet);
-        Optional<Set<SysRoleVM>> sysRoleVMS = sysRoles.map(roleSet -> roleSet.stream().map(sysRole -> baseSysRoleMapstruct.entityToVM(sysRole)).collect(Collectors.toSet()));
-        return sysRoleVMS;
+        // 获取当前用户 ID
+        Long userId = SecurityContextUtil.getCurrentUser()
+                .map(SimpleUser::getUserId)
+                .orElseThrow(() -> new AppException("获取当前登录用户失败"));
+
+        // 重新查询用户以获取完整的角色实体对象
+        return baseSysUserRepository.findById(userId)
+                .map(user -> user.getRoleSet().stream()
+                        .map(baseSysRoleMapstruct::entityToVM)
+                        .collect(Collectors.toSet()));
     }
 }

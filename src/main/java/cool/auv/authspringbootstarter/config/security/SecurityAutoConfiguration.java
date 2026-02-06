@@ -3,9 +3,7 @@ package cool.auv.authspringbootstarter.config.security;
 import cool.auv.authspringbootstarter.config.TenantIdFilter;
 import cool.auv.authspringbootstarter.config.security.jwt.JWTFilter;
 import cool.auv.authspringbootstarter.config.security.jwt.TokenProvider;
-import cool.auv.authspringbootstarter.service.SimpleUserService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -31,12 +29,6 @@ import java.util.stream.Stream;
 @EntityScan(basePackages = "cool.auv.authspringbootstarter.entity")
 @EnableConfigurationProperties(SecurityProperties.class)
 public class SecurityAutoConfiguration {
-
-    @Bean
-    @ConditionalOnMissingBean
-    public SimpleUserService simpleUserService() {
-        return new SimpleUserService();
-    }
 
     private HttpSecurity configureCommon(HttpSecurity http) throws Exception {
         return http

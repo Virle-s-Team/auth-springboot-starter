@@ -3,6 +3,7 @@ package cool.auv.authspringbootstarter.config.security.jwt;
 import cool.auv.authspringbootstarter.config.TenantContext;
 import cool.auv.authspringbootstarter.constant.AuthoritiesConstants;
 import cool.auv.authspringbootstarter.entity.SysUser;
+import cool.auv.authspringbootstarter.security.principal.SimpleUser;
 import cool.auv.authspringbootstarter.service.SysUserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -65,10 +66,15 @@ public class TokenProvider {
         long userId = ((Number) claims.get(AuthoritiesConstants.LOGIN_ACCOUNT_ID)).longValue();
         String tenantId = (String) claims.get(AuthoritiesConstants.LOGIN_ACCOUNT_TENANT_ID);
         TenantContext.setTenantId(tenantId);
-        // 设置认证对象
+
+        // 查询用户并加载权限（在事务内）
         SysUser sysUser = sysUserService.loadUserWithAuthorities(userId);
-        Collection<? extends GrantedAuthority> authorities = sysUser.getAuthorities();
-        return new UsernamePasswordAuthenticationToken(sysUser, token, authorities);
+
+        // 构建 SimpleUser（轻量级认证对象，不依赖 JPA Session）
+        SimpleUser simpleUser = SimpleUser.fromSysUser(sysUser);
+
+        Collection<? extends GrantedAuthority> authorities = simpleUser.getAuthorities();
+        return new UsernamePasswordAuthenticationToken(simpleUser, token, authorities);
 
     }
 
