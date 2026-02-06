@@ -28,10 +28,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -157,25 +154,30 @@ public class SysUserServiceImpl extends AbstractAutoService<SysUser, Long, SysUs
         SysUser currentUser = baseSysUserRepository.findById(userId)
                 .orElseThrow(() -> new AppException("用户不存在"));
 
-        // 获取所有权限并筛选出菜单类型
+        // 获取所有权限并筛选出菜单类型，按 sortNo 排序
         Set<SysPermission> allPermission = currentUser.getAllPermission();
-        Set<SysPermission> menuPermissions = allPermission.stream()
+        List<SysPermission> menuPermissions = allPermission.stream()
                 .filter(permission -> Boolean.TRUE.equals(permission.getRenderMenu())) // 只显示 renderMenu=true 的
-                .collect(Collectors.toSet());
+                .sorted(Comparator.comparing(SysPermission::getSortNo, Comparator.nullsLast(Integer::compareTo)))
+                .toList();
 
-        // 过滤出顶级菜单
-        Set<SysPermission> topMenus = menuPermissions.stream()
+        // 过滤出顶级菜单，并按 sortNo 排序
+        List<SysPermission> topMenus = menuPermissions.stream()
                 .filter(menu -> menu.getParent() == null)
-                .collect(Collectors.toSet());
+                .sorted(Comparator.comparing(SysPermission::getSortNo, Comparator.nullsLast(Integer::compareTo)))
+                .toList();
 
-        return Optional.of(topMenus.stream().map(menu -> {
-            // 根据当前的菜单获取子菜单
-            Set<SysPermission> children = menuPermissions.stream()
+        Set<SysPermissionTreeVM> menuTree = topMenus.stream().map(menu -> {
+            // 根据当前的菜单获取子菜单，并按 sortNo 排序
+            List<SysPermission> children = menuPermissions.stream()
                     .filter(item -> item.getParent() != null && menu.getId().equals(item.getParent().getId()))
-                    .collect(Collectors.toSet());
+                    .sorted(Comparator.comparing(SysPermission::getSortNo, Comparator.nullsLast(Integer::compareTo)))
+                    .toList();
             // 构建vm
-            return new SysPermissionTreeVM().setPermission(menu).setChildren(children);
-        }).collect(Collectors.toSet()));
+            return new SysPermissionTreeVM().setPermission(menu).setChildren(new LinkedHashSet<>(children));
+        }).collect(Collectors.toCollection(LinkedHashSet::new));
+
+        return Optional.of(menuTree);
     }
 
 
