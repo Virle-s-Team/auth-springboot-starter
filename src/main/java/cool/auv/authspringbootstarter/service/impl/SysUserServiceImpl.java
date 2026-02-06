@@ -145,6 +145,39 @@ public class SysUserServiceImpl extends AbstractAutoService<SysUser, Long, SysUs
 
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public Optional<Set<SysPermissionTreeVM>> getCurrentUserMenu() {
+        // 获取当前用户 ID
+        Long userId = SecurityContextUtil.getCurrentUser()
+                .map(SimpleUser::getUserId)
+                .orElseThrow(() -> new AppException("获取当前登录用户失败"));
+
+        // 重新查询用户以获取完整的权限实体对象
+        SysUser currentUser = baseSysUserRepository.findById(userId)
+                .orElseThrow(() -> new AppException("用户不存在"));
+
+        // 获取所有权限并筛选出菜单类型
+        Set<SysPermission> allPermission = currentUser.getAllPermission();
+        Set<SysPermission> menuPermissions = allPermission.stream()
+                .filter(permission -> Boolean.TRUE.equals(permission.getRenderMenu())) // 只显示 renderMenu=true 的
+                .collect(Collectors.toSet());
+
+        // 过滤出顶级菜单
+        Set<SysPermission> topMenus = menuPermissions.stream()
+                .filter(menu -> menu.getParent() == null)
+                .collect(Collectors.toSet());
+
+        return Optional.of(topMenus.stream().map(menu -> {
+            // 根据当前的菜单获取子菜单
+            Set<SysPermission> children = menuPermissions.stream()
+                    .filter(item -> item.getParent() != null && menu.getId().equals(item.getParent().getId()))
+                    .collect(Collectors.toSet());
+            // 构建vm
+            return new SysPermissionTreeVM().setPermission(menu).setChildren(children);
+        }).collect(Collectors.toSet()));
+    }
+
 
     @Override
     @Transactional
