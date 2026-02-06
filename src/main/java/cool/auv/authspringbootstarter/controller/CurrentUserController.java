@@ -1,18 +1,14 @@
 package cool.auv.authspringbootstarter.controller;
 
-import cool.auv.authspringbootstarter.entity.SysRole;
+import cool.auv.authspringbootstarter.security.principal.SimpleUser;
 import cool.auv.authspringbootstarter.service.SysUserService;
-import cool.auv.authspringbootstarter.vm.SysPermissionTreeVM;
-import cool.auv.authspringbootstarter.vm.SysRoleVM;
-import cool.auv.codegeneratorjpa.core.base.BaseAutoMapstruct;
+import cool.auv.authspringbootstarter.utils.SecurityContextUtil;
 import cool.auv.codegeneratorjpa.core.exception.AppException;
-import cool.auv.codegeneratorjpa.core.utils.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
 import java.util.Set;
 
 @RestController
@@ -22,19 +18,26 @@ public class CurrentUserController {
     @Autowired
     private SysUserService sysUserService;
 
-    @Autowired
-    private BaseAutoMapstruct<SysRole, SysRoleVM> baseSysRoleMapstruct;
-
+    /**
+     * 获取当前用户角色标识列表
+     * 从 SimpleUser 直接获取，无需查询数据库
+     */
     @GetMapping("/get-role")
-    public ResponseEntity<Set<SysRoleVM>> getCurrentRole() {
-        Optional<Set<SysRoleVM>> currentUserRole = sysUserService.getCurrentUserRole();
-        return ResponseUtil.wrapOrNotFound(currentUserRole);
+    public ResponseEntity<Set<String>> getCurrentRole() {
+        SimpleUser user = SecurityContextUtil.getCurrentUser()
+                .orElseThrow(() -> new AppException("用户未登录"));
+        return ResponseEntity.ok(user.getRoles());
     }
 
+    /**
+     * 获取当前用户权限标识列表
+     * 从 SimpleUser 直接获取，无需查询数据库
+     */
     @GetMapping("/permissions")
-    public ResponseEntity<Set<SysPermissionTreeVM>> getPermission() {
-        Optional<Set<SysPermissionTreeVM>> currentUserPermission = sysUserService.getCurrentUserPermission();
-        return ResponseUtil.wrapOrNotFound(currentUserPermission);
+    public ResponseEntity<Set<String>> getPermission() {
+        SimpleUser user = SecurityContextUtil.getCurrentUser()
+                .orElseThrow(() -> new AppException("用户未登录"));
+        return ResponseEntity.ok(user.getPermissions());
     }
 
     public record UpdatePasswordRequest(String oldPassword, String newPassword) {
