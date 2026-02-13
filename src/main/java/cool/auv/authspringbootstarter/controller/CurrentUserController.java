@@ -3,7 +3,7 @@ package cool.auv.authspringbootstarter.controller;
 import cool.auv.authspringbootstarter.security.principal.SimpleUser;
 import cool.auv.authspringbootstarter.service.SysUserService;
 import cool.auv.authspringbootstarter.utils.SecurityContextUtil;
-import cool.auv.authspringbootstarter.vm.SysPermissionTreeVM;
+import cool.auv.authspringbootstarter.vm.MenuVM;
 import cool.auv.codegeneratorjpa.core.exception.AppException;
 import cool.auv.codegeneratorjpa.core.utils.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,11 +45,11 @@ public class CurrentUserController {
 
     /**
      * 获取当前用户菜单树
-     * 从所有权限中筛选出 renderMenu=true 的菜单，构建树状结构
+     * 从所有权限中筛选出 renderMenu=true 的菜单，构建递归树状结构
      */
     @GetMapping("/menus")
-    public ResponseEntity<Set<SysPermissionTreeVM>> getMenus() {
-        Optional<Set<SysPermissionTreeVM>> menus = sysUserService.getCurrentUserMenu();
+    public ResponseEntity<Set<MenuVM>> getMenus() {
+        Optional<Set<MenuVM>> menus = sysUserService.getCurrentUserMenu();
         return ResponseUtil.wrapOrNotFound(menus);
     }
 

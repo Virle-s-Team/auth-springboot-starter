@@ -27,7 +27,7 @@ public interface SysUserService extends BaseAutoService<SysUser, Long, SysUserRe
 
     Optional<Set<SysPermissionTreeVM>> getCurrentUserPermission();
 
-    Optional<Set<SysPermissionTreeVM>> getCurrentUserMenu();
+    Optional<Set<MenuVM>> getCurrentUserMenu();
 
     void save(SysUserUpdateVM sysUserVM) throws AppException;
 

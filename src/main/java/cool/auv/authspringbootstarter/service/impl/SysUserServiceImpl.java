@@ -144,7 +144,7 @@ public class SysUserServiceImpl extends AbstractAutoService<SysUser, Long, SysUs
 
     @Transactional(readOnly = true)
     @Override
-    public Optional<Set<SysPermissionTreeVM>> getCurrentUserMenu() {
+    public Optional<Set<MenuVM>> getCurrentUserMenu() {
         // 获取当前用户 ID
         Long userId = SecurityContextUtil.getCurrentUser()
                 .map(SimpleUser::getUserId)
@@ -154,30 +154,62 @@ public class SysUserServiceImpl extends AbstractAutoService<SysUser, Long, SysUs
         SysUser currentUser = baseSysUserRepository.findById(userId)
                 .orElseThrow(() -> new AppException("用户不存在"));
 
-        // 获取所有权限并筛选出菜单类型，按 sortNo 排序
+        // 获取所有权限并筛选出菜单类型
         Set<SysPermission> allPermission = currentUser.getAllPermission();
         List<SysPermission> menuPermissions = allPermission.stream()
                 .filter(permission -> Boolean.TRUE.equals(permission.getRenderMenu())) // 只显示 renderMenu=true 的
                 .sorted(Comparator.comparing(SysPermission::getSortNo, Comparator.nullsLast(Integer::compareTo)))
                 .toList();
 
-        // 过滤出顶级菜单，并按 sortNo 排序
-        List<SysPermission> topMenus = menuPermissions.stream()
-                .filter(menu -> menu.getParent() == null)
-                .sorted(Comparator.comparing(SysPermission::getSortNo, Comparator.nullsLast(Integer::compareTo)))
-                .toList();
-
-        Set<SysPermissionTreeVM> menuTree = topMenus.stream().map(menu -> {
-            // 根据当前的菜单获取子菜单，并按 sortNo 排序
-            List<SysPermission> children = menuPermissions.stream()
-                    .filter(item -> item.getParent() != null && menu.getId().equals(item.getParent().getId()))
-                    .sorted(Comparator.comparing(SysPermission::getSortNo, Comparator.nullsLast(Integer::compareTo)))
-                    .toList();
-            // 构建vm
-            return new SysPermissionTreeVM().setPermission(menu).setChildren(new LinkedHashSet<>(children));
-        }).collect(Collectors.toCollection(LinkedHashSet::new));
+        // 构建树状结构（递归）
+        Set<MenuVM> menuTree = buildMenuTree(menuPermissions, null);
 
         return Optional.of(menuTree);
+    }
+
+    /**
+     * 递归构建菜单树
+     *
+     * @param allMenus 所有菜单列表（已排序）
+     * @param parentId 父菜单ID（null 表示顶级菜单）
+     * @return 菜单树
+     */
+    private Set<MenuVM> buildMenuTree(List<SysPermission> allMenus, Long parentId) {
+        return allMenus.stream()
+                .filter(menu -> {
+                    // 判断是否为指定父级的子菜单
+                    if (parentId == null) {
+                        return menu.getParent() == null;
+                    } else {
+                        return menu.getParent() != null && parentId.equals(menu.getParent().getId());
+                    }
+                })
+                .map(menu -> {
+                    // 递归构建子菜单
+                    Set<MenuVM> children = buildMenuTree(allMenus, menu.getId());
+
+                    return new MenuVM()
+                            .setId(menu.getId())
+                            .setParentId(menu.getParent() != null ? menu.getParent().getId() : null)
+                            .setTitle(menu.getTitle())
+                            .setName(menu.getName())
+                            .setPath(menu.getPath())
+                            .setComponent(menu.getComponent())
+                            .setIcon(menu.getIcon())
+                            .setBadge(menu.getBadge())
+                            .setLink(menu.getLink())
+                            .setTarget(menu.getTarget())
+                            .setHidden(!menu.getRenderMenu())
+                            .setSortNo(menu.getSortNo())
+                            .setChildren(children.isEmpty() ? null : children)
+                            .setMeta(MenuVM.Meta.from(
+                                    menu.getTitle(),
+                                    menu.getIcon(),
+                                    !menu.getRenderMenu(),
+                                    menu.getSortNo()
+                            ));
+                })
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
 
